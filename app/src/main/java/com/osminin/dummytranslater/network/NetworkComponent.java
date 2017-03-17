@@ -1,0 +1,16 @@
+package com.osminin.dummytranslater.network;
+
+import com.osminin.dummytranslater.MainActivity;
+import com.osminin.dummytranslater.network.modules.NetworkModule;
+
+import dagger.Subcomponent;
+
+/**
+ * Created by osminin on 3/17/2017.
+ */
+
+@NetworkScope
+@Subcomponent(modules = NetworkModule.class)
+public interface NetworkComponent {
+    void inject(MainActivity activity);
+}
