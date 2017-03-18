@@ -8,6 +8,8 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import retrofit2.Retrofit;
 
+import static com.osminin.dummytranslater.Config.API_KEY;
+
 /**
  * Created by osminin on 3/17/2017.
  */
@@ -21,7 +23,7 @@ public final class YTranslatorServiceImpl implements TranslatorService {
     }
 
     @Override
-    public Observable<TranslateResponseModel> translate(String lang, String key, String text) {
-        return mTranslatorService.translate(lang, key, text);
+    public Observable<TranslateResponseModel> translate(String lang, String text) {
+        return mTranslatorService.translate(lang, API_KEY, text);
     }
 }

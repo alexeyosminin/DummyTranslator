@@ -6,8 +6,11 @@ import com.osminin.dummytranslater.network.yapi.YTranslatorService;
 import com.osminin.dummytranslater.network.yapi.YTranslatorServiceImpl;
 import com.osminin.dummytranslater.network.NetworkScope;
 
+import java.util.concurrent.TimeUnit;
+
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;

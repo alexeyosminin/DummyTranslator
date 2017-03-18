@@ -3,6 +3,9 @@ package com.osminin.dummytranslater.application;
 import android.app.Application;
 import android.content.Context;
 
+import com.osminin.dummytranslater.presentation.MainPresenterImpl;
+import com.osminin.dummytranslater.presentation.interfaces.MainPresenter;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -24,5 +27,10 @@ public final class AppModule {
     @AppScope
     Context provideContext() {
         return app;
+    }
+
+    @Provides
+    MainPresenter provideMainPresenter() {
+        return new MainPresenterImpl();
     }
 }

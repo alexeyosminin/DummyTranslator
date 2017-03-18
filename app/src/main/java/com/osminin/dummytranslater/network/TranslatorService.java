@@ -9,5 +9,5 @@ import io.reactivex.Observable;
  */
 
 public interface TranslatorService {
-    Observable<TranslateResponseModel> translate(String lang, String key, String text);
+    Observable<TranslateResponseModel> translate(String lang, String text);
 }

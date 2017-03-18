@@ -1,5 +1,6 @@
 package com.osminin.dummytranslater.application;
 
+import com.osminin.dummytranslater.ui.MainActivity;
 import com.osminin.dummytranslater.network.NetworkComponent;
 import com.osminin.dummytranslater.network.modules.NetworkModule;
 
@@ -15,4 +16,6 @@ import dagger.Component;
 @Component (modules = AppModule.class)
 public interface AppComponent {
     NetworkComponent plusNetworkComponent(NetworkModule networkModule);
+
+    void inject(MainActivity mainActivity);
 }
