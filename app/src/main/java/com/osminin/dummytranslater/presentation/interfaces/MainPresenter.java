@@ -10,6 +10,6 @@ import io.reactivex.Observable;
  */
 
 public interface MainPresenter extends BasePresenter<MainView> {
-    void startObserveTextChanges(Observable<CharSequence> observable);
-    void stopObserveTextChanges();
+    void startObserveTextInput(Observable<Object> observable);
+    void stopObserveTextInput();
 }

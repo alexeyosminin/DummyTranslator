@@ -2,6 +2,8 @@ package com.osminin.dummytranslater.network;
 
 import com.osminin.dummytranslater.network.modules.NetworkModule;
 import com.osminin.dummytranslater.presentation.MainPresenterImpl;
+import com.osminin.dummytranslater.presentation.TranslationPresenterImpl;
+import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;
 
 import dagger.Subcomponent;
 
@@ -12,5 +14,5 @@ import dagger.Subcomponent;
 @NetworkScope
 @Subcomponent(modules = NetworkModule.class)
 public interface NetworkComponent {
-    void inject(MainPresenterImpl presenter);
+    void inject(TranslationPresenterImpl presenter);
 }

@@ -1,5 +1,7 @@
 package com.osminin.dummytranslater.presentation;
 
+import android.util.Log;
+
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.network.NetworkComponent;
 import com.osminin.dummytranslater.network.TranslatorService;
@@ -22,36 +24,24 @@ import io.reactivex.schedulers.Schedulers;
 
 public final class MainPresenterImpl implements MainPresenter {
 
-    private static NetworkComponent networkComponent;
-
-    @Inject
-    TranslatorService mTranslatorService;
-
     private MainView mView;
     private Disposable mDisposable;
 
     @Override
     public void bind(MainView view) {
         mView = view;
-        networkComponent = App.getComponent().plusNetworkComponent(new NetworkModule());
-        networkComponent.inject(this);
     }
 
     @Override
-    public void startObserveTextChanges(Observable<CharSequence> observable) {
+    public void startObserveTextInput(Observable<Object> observable) {
         mDisposable = observable
-                .filter(s -> s.length() > 2)
                 .debounce(100, TimeUnit.MILLISECONDS)
-                .observeOn(Schedulers.io())
-                .switchMap(s -> mTranslatorService.translate("en-ru", s.toString()))
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(s -> mView.onTextTranslated(s.getText().get(0)),
-                        e -> e.printStackTrace());
+                .subscribe(o -> mView.showTranslationView());
     }
 
     @Override
-    public void stopObserveTextChanges() {
+    public void stopObserveTextInput() {
         if (!mDisposable.isDisposed()) {
             mDisposable.dispose();
         }

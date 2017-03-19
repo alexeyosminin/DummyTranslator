@@ -4,7 +4,9 @@ import android.app.Application;
 import android.content.Context;
 
 import com.osminin.dummytranslater.presentation.MainPresenterImpl;
+import com.osminin.dummytranslater.presentation.TranslationPresenterImpl;
 import com.osminin.dummytranslater.presentation.interfaces.MainPresenter;
+import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;
 
 import dagger.Module;
 import dagger.Provides;
@@ -32,5 +34,10 @@ public final class AppModule {
     @Provides
     MainPresenter provideMainPresenter() {
         return new MainPresenterImpl();
+    }
+
+    @Provides
+    TranslationPresenter provideTranslationPresenter() {
+        return new TranslationPresenterImpl();
     }
 }

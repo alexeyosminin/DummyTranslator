@@ -1,10 +1,11 @@
 package com.osminin.dummytranslater.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.EditText;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding2.widget.RxTextView;
+import com.jakewharton.rxbinding2.view.RxView;
 import com.osminin.dummytranslater.R;
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.presentation.interfaces.MainPresenter;
@@ -21,9 +22,7 @@ public class MainActivity extends BaseActivity implements MainView {
     MainPresenter mPresenter;
 
     @BindView(R.id.main_edit_text)
-    EditText mEditText;
-    @BindView(R.id.main_text_view)
-    TextView mTextView;
+    TextView mTranslationField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +36,12 @@ public class MainActivity extends BaseActivity implements MainView {
     @Override
     protected void onResume() {
         super.onResume();
-        mPresenter.startObserveTextChanges(RxTextView.textChanges(mEditText));
+        mPresenter.startObserveTextInput(RxView.clicks(mTranslationField));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mPresenter.stopObserveTextChanges();
     }
 
     @Override
@@ -53,6 +51,14 @@ public class MainActivity extends BaseActivity implements MainView {
 
     @Override
     public void onTextTranslated(String text) {
-        mTextView.setText(text);
+        mTranslationField.setText(text);
+    }
+
+    @Override
+    public void showTranslationView() {
+        Intent intent = new Intent(this, TranslationActivity.class);
+        ActivityOptionsCompat options = ActivityOptionsCompat.
+                makeSceneTransitionAnimation(this, mTranslationField, getString(R.string.main_translate_transition));
+        startActivity(intent, options.toBundle());
     }
 }

@@ -24,15 +24,22 @@ import static com.osminin.dummytranslater.Config.HOST;
 @Module
 @NetworkScope
 public final class NetworkModule {
+    private static final int REQUESTS_TIMEOUT = 60;
 
     @Provides
     @NetworkScope
     @Named(YTranslatorService.class)
     Retrofit provideRetrofit() {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(REQUESTS_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(REQUESTS_TIMEOUT, TimeUnit.SECONDS)
+                .writeTimeout(REQUESTS_TIMEOUT, TimeUnit.SECONDS)
+                .build();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .client(okHttpClient)
                 .build();
         return retrofit;
     }

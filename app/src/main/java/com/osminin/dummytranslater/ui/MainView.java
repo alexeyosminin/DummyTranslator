@@ -11,4 +11,6 @@ import io.reactivex.Observable;
 
 public interface MainView extends BaseView {
     void onTextTranslated(String text);
+
+    void showTranslationView();
 }

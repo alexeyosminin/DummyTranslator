@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">DummyTranslater</string>
+
+    <string name="main_tap_to_enter">Tap to enter text</string>
+    <string name="main_translate_transition">translate_text_view</string>
+
 </resources>
