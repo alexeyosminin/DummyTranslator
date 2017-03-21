@@ -24,16 +24,18 @@ import static com.osminin.dummytranslater.Config.HOST;
 @Module
 @NetworkScope
 public final class NetworkModule {
-    private static final int REQUESTS_TIMEOUT = 60;
+    private static final int REQUESTS_TIMEOUT = 1;
+    private static final TimeUnit REQUESTS_TIMEOUT_UNITS = TimeUnit.SECONDS;
+
 
     @Provides
     @NetworkScope
     @Named(YTranslatorService.class)
     Retrofit provideRetrofit() {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(REQUESTS_TIMEOUT, TimeUnit.SECONDS)
-                .readTimeout(REQUESTS_TIMEOUT, TimeUnit.SECONDS)
-                .writeTimeout(REQUESTS_TIMEOUT, TimeUnit.SECONDS)
+                .connectTimeout(REQUESTS_TIMEOUT, REQUESTS_TIMEOUT_UNITS)
+                .readTimeout(REQUESTS_TIMEOUT, REQUESTS_TIMEOUT_UNITS)
+                .writeTimeout(REQUESTS_TIMEOUT, REQUESTS_TIMEOUT_UNITS)
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)

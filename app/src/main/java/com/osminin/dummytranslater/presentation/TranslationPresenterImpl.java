@@ -41,14 +41,19 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     }
 
     @Override
-    public void startObserveTextChanges(Observable<CharSequence> observable) {
+    public void startObserveTextChanges(final Observable<CharSequence> observable) {
         mDisposable = observable
                 .filter(s -> s.length() > INPUT_MIN)
                 .debounce(INPUT_TIMEOUT, TimeUnit.MILLISECONDS, Schedulers.io())
                 .switchMap(s -> mTranslatorService.translate("en-ru", s.toString()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(s -> mView.onTextTranslated(s.getText()),
-                        e -> e.printStackTrace());
+                        e -> {
+                            //restart subscription
+                            stopObserveTextChanges();
+                            startObserveTextChanges(observable);
+                            e.printStackTrace();}
+                );
     }
 
     @Override

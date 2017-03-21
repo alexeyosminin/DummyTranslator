@@ -1,22 +1,14 @@
 package com.osminin.dummytranslater.presentation;
 
-import android.util.Log;
-
-import com.osminin.dummytranslater.application.App;
-import com.osminin.dummytranslater.network.NetworkComponent;
-import com.osminin.dummytranslater.network.TranslatorService;
-import com.osminin.dummytranslater.network.modules.NetworkModule;
+import com.osminin.dummytranslater.models.RecentModel;
 import com.osminin.dummytranslater.presentation.interfaces.MainPresenter;
 import com.osminin.dummytranslater.ui.MainView;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * TODO: Add a class header comment!
@@ -25,7 +17,7 @@ import io.reactivex.schedulers.Schedulers;
 public final class MainPresenterImpl implements MainPresenter {
 
     private MainView mView;
-    private Disposable mDisposable;
+    private CompositeDisposable mDisposable;
 
     @Override
     public void bind(MainView view) {
@@ -34,16 +26,29 @@ public final class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void startObserveTextInput(Observable<Object> observable) {
-        mDisposable = observable
+        verifyDisposable();
+        mDisposable.add(observable
                 .debounce(100, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(o -> mView.showTranslationView());
+                .subscribe(o -> mView.showTranslationView()));
     }
 
     @Override
-    public void stopObserveTextInput() {
+    public void startObserveRecentClicks(Observable<RecentModel> observable) {
+        verifyDisposable();
+        mDisposable.add(observable.subscribe());
+    }
+
+    @Override
+    public void stopObserveUiEvents() {
         if (!mDisposable.isDisposed()) {
             mDisposable.dispose();
+        }
+    }
+
+    private void verifyDisposable() {
+        if (mDisposable == null || mDisposable.isDisposed()) {
+            mDisposable = new CompositeDisposable();
         }
     }
 }
