@@ -11,8 +11,8 @@ import dagger.Subcomponent;
  * Created by osminin on 3/17/2017.
  */
 
-@NetworkScope
 @Subcomponent(modules = NetworkModule.class)
+@NetworkScope
 public interface NetworkComponent {
     void inject(TranslationPresenterImpl presenter);
 }

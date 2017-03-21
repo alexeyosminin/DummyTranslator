@@ -9,10 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView;
-import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerViewAdapter;
 import com.jakewharton.rxbinding2.view.RxView;
-import com.jakewharton.rxbinding2.widget.RxAdapterView;
 import com.osminin.dummytranslater.R;
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.presentation.interfaces.MainPresenter;
@@ -41,7 +38,7 @@ public class MainActivity extends BaseActivity implements MainView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        App.getComponent().inject(this);
+        App.getAppComponent().inject(this);
         mPresenter.bind(this);
         initList();
     }

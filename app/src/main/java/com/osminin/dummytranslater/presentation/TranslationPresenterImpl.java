@@ -26,8 +26,6 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     private static final int INPUT_MIN = 2;
     private static final int INPUT_MAX = 10000;
 
-    private static NetworkComponent networkComponent;
-
     @Inject
     TranslatorService mTranslatorService;
     private TranslationView mView;
@@ -36,8 +34,7 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     @Override
     public void bind(TranslationView view) {
         mView = view;
-        networkComponent = App.getComponent().plusNetworkComponent(new NetworkModule());
-        networkComponent.inject(this);
+        App.plusNetworkComponent().inject(this);
     }
 
     @Override
@@ -61,5 +58,10 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
         if (!mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
+    }
+
+    @Override
+    public void destroy() {
+        App.clearNetworkComponent();
     }
 }

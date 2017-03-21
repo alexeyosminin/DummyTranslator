@@ -16,7 +16,6 @@ import dagger.Provides;
  */
 
 @Module
-@AppScope
 public final class AppModule {
 
     private final Application app;

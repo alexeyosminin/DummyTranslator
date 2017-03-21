@@ -1,7 +1,6 @@
 package com.osminin.dummytranslater.ui;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -29,7 +28,7 @@ public final class TranslationActivity extends BaseActivity implements Translati
     TranslationPresenter mPresenter;
 
     @BindView(R.id.translate_edit_text)
-    EditText mTranlationInput;
+    EditText mTranslationInput;
     @BindView(R.id.translate_result)
     TextView mTranslationResult;
 
@@ -38,14 +37,14 @@ public final class TranslationActivity extends BaseActivity implements Translati
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_translation);
         ButterKnife.bind(this);
-        App.getComponent().inject(this);
+        App.getAppComponent().inject(this);
         mPresenter.bind(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mPresenter.startObserveTextChanges(RxTextView.textChanges(mTranlationInput));
+        mPresenter.startObserveTextChanges(RxTextView.textChanges(mTranslationInput));
     }
 
     @Override
@@ -55,7 +54,14 @@ public final class TranslationActivity extends BaseActivity implements Translati
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPresenter.destroy();
+    }
+
+    @Override
     public void onTextTranslated(List<String> text) {
+        //TODO: rework!
         String resText = "";
         for (String str : text) {
             resText = str + "\n";
