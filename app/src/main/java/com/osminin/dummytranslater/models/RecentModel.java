@@ -9,6 +9,12 @@ public class RecentModel {
     private String mSecondaryText;
     private boolean isFavorite;
 
+    public RecentModel(String primaryText, String secondaryText, boolean isFavorite) {
+        mPrimaryText = primaryText;
+        mSecondaryText = secondaryText;
+        this.isFavorite = isFavorite;
+    }
+
     public String getPrimaryText() {
         return mPrimaryText;
     }

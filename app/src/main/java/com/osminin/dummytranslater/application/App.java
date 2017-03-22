@@ -3,7 +3,7 @@ package com.osminin.dummytranslater.application;
 import android.app.Application;
 
 import com.osminin.dummytranslater.db.DbComponent;
-import com.osminin.dummytranslater.db.DbModule;
+import com.osminin.dummytranslater.db.modules.DbModule;
 import com.osminin.dummytranslater.network.NetworkComponent;
 import com.osminin.dummytranslater.network.modules.NetworkModule;
 

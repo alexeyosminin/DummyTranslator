@@ -1,7 +1,7 @@
 package com.osminin.dummytranslater.application;
 
 import com.osminin.dummytranslater.db.DbComponent;
-import com.osminin.dummytranslater.db.DbModule;
+import com.osminin.dummytranslater.db.modules.DbModule;
 import com.osminin.dummytranslater.ui.MainActivity;
 import com.osminin.dummytranslater.network.NetworkComponent;
 import com.osminin.dummytranslater.network.modules.NetworkModule;
@@ -16,7 +16,7 @@ import dagger.Component;
  */
 
 @Component (modules = AppModule.class)
-@Singleton
+@AppScope
 public interface AppComponent {
     NetworkComponent plusNetworkComponent(NetworkModule networkModule);
     DbComponent plusDbComponent(DbModule dbModule);

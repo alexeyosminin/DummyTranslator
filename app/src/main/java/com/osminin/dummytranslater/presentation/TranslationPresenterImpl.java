@@ -1,9 +1,7 @@
 package com.osminin.dummytranslater.presentation;
 
 import com.osminin.dummytranslater.application.App;
-import com.osminin.dummytranslater.network.NetworkComponent;
 import com.osminin.dummytranslater.network.TranslatorService;
-import com.osminin.dummytranslater.network.modules.NetworkModule;
 import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;
 import com.osminin.dummytranslater.ui.TranslationView;
 

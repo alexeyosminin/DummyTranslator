@@ -1,10 +1,14 @@
 package com.osminin.dummytranslater.presentation;
 
+import com.osminin.dummytranslater.application.App;
+import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
 import com.osminin.dummytranslater.models.RecentModel;
 import com.osminin.dummytranslater.presentation.interfaces.MainPresenter;
 import com.osminin.dummytranslater.ui.MainView;
 
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -16,12 +20,16 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public final class MainPresenterImpl implements MainPresenter {
 
+    @Inject
+    TranslationDataStore mDataStore;
+
     private MainView mView;
     private CompositeDisposable mDisposable;
 
     @Override
     public void bind(MainView view) {
         mView = view;
+        App.plusDbComponent().inject(this);
     }
 
     @Override
