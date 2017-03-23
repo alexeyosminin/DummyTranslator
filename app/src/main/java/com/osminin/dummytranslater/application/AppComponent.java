@@ -2,6 +2,8 @@ package com.osminin.dummytranslater.application;
 
 import com.osminin.dummytranslater.db.DbComponent;
 import com.osminin.dummytranslater.db.modules.DbModule;
+import com.osminin.dummytranslater.presentation.MainPresenterImpl;
+import com.osminin.dummytranslater.presentation.TranslationPresenterImpl;
 import com.osminin.dummytranslater.ui.MainActivity;
 import com.osminin.dummytranslater.network.NetworkComponent;
 import com.osminin.dummytranslater.network.modules.NetworkModule;
@@ -18,7 +20,6 @@ import dagger.Component;
 @Component (modules = AppModule.class)
 @AppScope
 public interface AppComponent {
-    NetworkComponent plusNetworkComponent(NetworkModule networkModule);
     DbComponent plusDbComponent(DbModule dbModule);
 
     void inject(MainActivity activity);

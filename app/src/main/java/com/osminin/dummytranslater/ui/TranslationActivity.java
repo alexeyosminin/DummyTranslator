@@ -1,5 +1,6 @@
 package com.osminin.dummytranslater.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -13,6 +14,7 @@ import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.jakewharton.rxbinding2.widget.TextViewTextChangeEvent;
 import com.osminin.dummytranslater.R;
 import com.osminin.dummytranslater.application.App;
+import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;
 import com.osminin.dummytranslater.ui.base.BaseActivity;
 
@@ -49,8 +51,8 @@ public final class TranslationActivity extends BaseActivity implements Translati
     @Override
     protected void onResume() {
         super.onResume();
-        mPresenter.startObserveTextChanges(RxTextView.textChanges(mTranslationInput));
-        mPresenter.startObserveTextChangesCompleted(RxView.keys(mTranslationInput));
+        mPresenter.startObserveTextChanges(RxTextView.textChanges(mTranslationInput),
+                RxView.keys(mTranslationInput));
     }
 
     @Override
@@ -76,7 +78,8 @@ public final class TranslationActivity extends BaseActivity implements Translati
     }
 
     @Override
-    public void onTextInputStop(KeyEvent event) {
+    public void onTextInputStop(TranslationModel model) {
+        setResult(RESULT_OK, new Intent().putExtra("res", model));
         supportFinishAfterTransition();
     }
 }

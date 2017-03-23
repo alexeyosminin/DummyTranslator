@@ -3,7 +3,7 @@ package com.osminin.dummytranslater.db.realm;
 import android.content.Context;
 
 import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
-import com.osminin.dummytranslater.models.RecentModel;
+import com.osminin.dummytranslater.models.TranslationModel;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import io.realm.Realm;
  * Created by osminin on 3/22/2017.
  */
 
-public final class RealmTranslationDataStore implements TranslationDataStore<RecentModel> {
+public final class RealmTranslationDataStore implements TranslationDataStore {
 
     private Realm mRealm;
 
@@ -26,7 +26,7 @@ public final class RealmTranslationDataStore implements TranslationDataStore<Rec
     }
 
     @Override
-    public Observable<RecentModel> add(RecentModel item) {
+    public Observable<TranslationModel> add(TranslationModel item) {
         return Observable.create(e -> {
             mRealm.beginTransaction();
             RealmRecentModel realmRecentModel = RealmRecentModel.toDbModel(mRealm, item);
@@ -37,19 +37,19 @@ public final class RealmTranslationDataStore implements TranslationDataStore<Rec
     }
 
     @Override
-    public Observable<RecentModel> update(RecentModel item) {
+    public Observable<TranslationModel> update(TranslationModel item) {
         //TODO: rework!
         return Observable.just(item);
     }
 
     @Override
-    public Observable<RecentModel> remove(RecentModel item) {
+    public Observable<TranslationModel> remove(TranslationModel item) {
         //TODO: rework!
         return Observable.just(item);
     }
 
     @Override
-    public Single<List<RecentModel>> queryAll() {
+    public Single<List<TranslationModel>> queryAll() {
         return Observable.fromIterable(mRealm.
                 where(RealmRecentModel.class)
                 .findAll())

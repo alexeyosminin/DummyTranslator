@@ -1,6 +1,6 @@
 package com.osminin.dummytranslater.presentation.interfaces;
 
-import com.osminin.dummytranslater.models.RecentModel;
+import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.presentation.interfaces.base.BasePresenter;
 import com.osminin.dummytranslater.ui.MainView;
 
@@ -12,6 +12,6 @@ import io.reactivex.Observable;
 
 public interface MainPresenter extends BasePresenter<MainView> {
     void startObserveTextInput(Observable<Object> observable);
-    void startObserveRecentClicks(Observable<RecentModel> observable);
+    void startObserveRecentClicks(Observable<TranslationModel> observable);
     void stopObserveUiEvents();
 }

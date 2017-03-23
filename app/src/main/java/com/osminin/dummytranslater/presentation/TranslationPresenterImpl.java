@@ -5,6 +5,8 @@ import android.view.KeyEvent;
 import com.jakewharton.rxbinding2.InitialValueObservable;
 import com.jakewharton.rxbinding2.widget.TextViewTextChangeEvent;
 import com.osminin.dummytranslater.application.App;
+import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
+import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.network.TranslatorService;
 import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;
 import com.osminin.dummytranslater.ui.TranslationView;
@@ -30,6 +32,8 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
 
     @Inject
     TranslatorService mTranslatorService;
+    @Inject
+    TranslationDataStore mDataStore;
     private TranslationView mView;
     private CompositeDisposable mDisposable;
 
@@ -40,18 +44,27 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     }
 
     @Override
-    public void startObserveTextChanges(final Observable<CharSequence> observable) {
+    public void startObserveTextChanges(final Observable<CharSequence> textObservable,
+                                        final Observable<KeyEvent> keysObservable) {
         verifyDisposable();
-        mDisposable.add(observable
-                .filter(s -> s.length() > INPUT_MIN)
+        mDisposable.add(textObservable
+                .filter(charSequence -> charSequence.length() > INPUT_MIN)
                 .debounce(INPUT_TIMEOUT, TimeUnit.MILLISECONDS, Schedulers.io())
-                .switchMap(s -> mTranslatorService.translate("en-ru", s.toString()))
+                .map(CharSequence::toString)
+                .switchMap(string -> mTranslatorService.translate("en-ru", string))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(s -> mView.onTextTranslated(s.getText()),
+                .doOnNext(responseModel -> mView.onTextTranslated(responseModel.getText()))
+                .observeOn(Schedulers.io())
+                .sample(keysObservable
+                        .filter(e -> e.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+                .map(responseModel -> responseModel.fromNetworkModel())
+                .switchMap(translationModel -> mDataStore.add(translationModel))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(translationModel -> mView.onTextInputStop(translationModel),
                         e -> {
                             //restart subscription
                             stopObserveTextChanges();
-                            startObserveTextChanges(observable);
+                            startObserveTextChanges(textObservable, keysObservable);
                             e.printStackTrace();
                         }
                 ));
@@ -62,14 +75,6 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
         if (!mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
-    }
-
-    @Override
-    public void startObserveTextChangesCompleted(Observable<KeyEvent> observable) {
-        verifyDisposable();
-        mDisposable.add(observable
-                .filter(e -> e.getKeyCode() == KeyEvent.KEYCODE_ENTER)
-                .subscribe((res) -> mView.onTextInputStop(res)));
     }
 
     @Override

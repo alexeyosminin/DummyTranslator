@@ -23,7 +23,7 @@ public final class App extends Application {
     public static NetworkComponent plusNetworkComponent() {
         // start lifecycle of network component
         if (networkComponent == null) {
-            networkComponent = appComponent.plusNetworkComponent(new NetworkModule());
+            networkComponent = dbComponent.plusNetworkComponent(new NetworkModule());
         }
         return networkComponent;
     }

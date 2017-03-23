@@ -8,6 +8,7 @@ package com.osminin.dummytranslater.network.models;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.osminin.dummytranslater.models.TranslationModel;
 
 public class TranslateResponseModel {
 
@@ -45,4 +46,11 @@ public class TranslateResponseModel {
         this.text = text;
     }
 
+    public TranslationModel fromNetworkModel() {
+        TranslationModel model = new TranslationModel();
+        if (text != null && !text.isEmpty()) {
+            model.setPrimaryText(text.get(0));
+        }
+        return model;
+    }
 }

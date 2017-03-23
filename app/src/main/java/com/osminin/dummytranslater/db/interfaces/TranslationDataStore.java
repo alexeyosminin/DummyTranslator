@@ -1,5 +1,7 @@
 package com.osminin.dummytranslater.db.interfaces;
 
+import com.osminin.dummytranslater.models.TranslationModel;
+
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -10,13 +12,13 @@ import io.reactivex.Single;
  */
 
 // interface for getting Recent, Suggestions and Favorites
-public interface TranslationDataStore<T> {
+public interface TranslationDataStore {
 
-    Observable<T> add(T item);
+    Observable<TranslationModel> add(TranslationModel item);
 
-    Observable<T> update(T item);
+    Observable<TranslationModel> update(TranslationModel item);
 
-    Observable<T> remove(T item);
+    Observable<TranslationModel> remove(TranslationModel item);
 
-    Single<List<T>> queryAll();
+    Single<List<TranslationModel>> queryAll();
 }

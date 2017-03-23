@@ -2,7 +2,7 @@ package com.osminin.dummytranslater.presentation;
 
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
-import com.osminin.dummytranslater.models.RecentModel;
+import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.presentation.interfaces.MainPresenter;
 import com.osminin.dummytranslater.ui.MainView;
 
@@ -42,7 +42,7 @@ public final class MainPresenterImpl implements MainPresenter {
     }
 
     @Override
-    public void startObserveRecentClicks(Observable<RecentModel> observable) {
+    public void startObserveRecentClicks(Observable<TranslationModel> observable) {
         verifyDisposable();
         mDisposable.add(observable.subscribe());
     }

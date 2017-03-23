@@ -3,6 +3,7 @@ package com.osminin.dummytranslater.ui;
 import android.view.KeyEvent;
 
 import com.jakewharton.rxbinding2.widget.TextViewTextChangeEvent;
+import com.osminin.dummytranslater.models.TranslationModel;
 
 import java.util.List;
 
@@ -12,5 +13,5 @@ import java.util.List;
 
 public interface TranslationView {
     void onTextTranslated(List<String> text);
-    void onTextInputStop(KeyEvent event);
+    void onTextInputStop(TranslationModel model);
 }

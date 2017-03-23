@@ -1,7 +1,10 @@
 package com.osminin.dummytranslater.db;
 
 import com.osminin.dummytranslater.db.modules.DbModule;
+import com.osminin.dummytranslater.network.NetworkComponent;
+import com.osminin.dummytranslater.network.modules.NetworkModule;
 import com.osminin.dummytranslater.presentation.MainPresenterImpl;
+import com.osminin.dummytranslater.presentation.TranslationPresenterImpl;
 
 import dagger.Subcomponent;
 
@@ -12,5 +15,7 @@ import dagger.Subcomponent;
 @Subcomponent(modules = DbModule.class)
 @DbScope
 public interface DbComponent {
+    NetworkComponent plusNetworkComponent(NetworkModule networkModule);
+
     void inject(MainPresenterImpl presenter);
 }

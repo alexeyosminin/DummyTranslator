@@ -8,7 +8,7 @@ import android.widget.FrameLayout;
 
 import com.jakewharton.rxbinding2.view.RxView;
 import com.osminin.dummytranslater.R;
-import com.osminin.dummytranslater.models.RecentModel;
+import com.osminin.dummytranslater.models.TranslationModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,15 +27,15 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public static final int TYPE_FOOTER = 222;
     public static final int TYPE_ITEM = 333;
     //our items
-    List<RecentModel> items = new ArrayList<>();
+    List<TranslationModel> items = new ArrayList<>();
     //headers
     List<View> headers = new ArrayList<>();
     //footers
     List<View> footers = new ArrayList<>();
 
-    private PublishSubject<RecentModel> mViewClickSubject = PublishSubject.create();
+    private PublishSubject<TranslationModel> mViewClickSubject = PublishSubject.create();
 
-    public Observable<RecentModel> getViewClickedObservable() {
+    public Observable<TranslationModel> getViewClickedObservable() {
         return mViewClickSubject;
     }
 
@@ -89,7 +89,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     private void prepareGeneric(GenericViewHolder vh, int position) {
-        RecentModel recentItem = items.get(position);
+        TranslationModel recentItem = items.get(position);
         RxView.clicks(vh.itemView)
                 .throttleFirst(CLICK_TIMEOUT, TimeUnit.MILLISECONDS)
                 .map(aVoid -> recentItem)

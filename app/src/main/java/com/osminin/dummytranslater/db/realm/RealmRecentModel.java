@@ -1,6 +1,6 @@
 package com.osminin.dummytranslater.db.realm;
 
-import com.osminin.dummytranslater.models.RecentModel;
+import com.osminin.dummytranslater.models.TranslationModel;
 
 import io.realm.Realm;
 import io.realm.RealmModel;
@@ -50,13 +50,13 @@ public class RealmRecentModel implements RealmModel {
         isFavorite = favorite;
     }
 
-    public RecentModel fromDbModel() {
-        return new RecentModel(getPrimaryText(),
+    public TranslationModel fromDbModel() {
+        return new TranslationModel(getPrimaryText(),
                 getSecondaryText(),
                 isFavorite());
     }
 
-    public static RealmRecentModel toDbModel(Realm realm, RecentModel model) {
+    public static RealmRecentModel toDbModel(Realm realm, TranslationModel model) {
         RealmRecentModel realmRecentModel = realm.createObject(RealmRecentModel.class);
         realmRecentModel.setPrimaryText(model.getPrimaryText());
         realmRecentModel.setSecondaryText(model.getSecondaryText());
@@ -64,7 +64,7 @@ public class RealmRecentModel implements RealmModel {
         return realmRecentModel;
     }
 
-    public static RealmRecentModel toDbModel(RecentModel model) {
+    public static RealmRecentModel toDbModel(TranslationModel model) {
         return new RealmRecentModel(model.getPrimaryText(),
                 model.getSecondaryText(),
                 model.isFavorite());
