@@ -2,6 +2,7 @@ package com.osminin.dummytranslater.db.interfaces;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 /**
@@ -11,11 +12,11 @@ import io.reactivex.Single;
 // interface for getting Recent, Suggestions and Favorites
 public interface TranslationDataStore<T> {
 
-    void add(T item);
+    Observable<T> add(T item);
 
-    void update(T item);
+    Observable<T> update(T item);
 
-    void remove(T item);
+    Observable<T> remove(T item);
 
     Single<List<T>> queryAll();
 }

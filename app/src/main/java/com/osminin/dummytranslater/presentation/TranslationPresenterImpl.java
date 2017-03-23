@@ -1,5 +1,9 @@
 package com.osminin.dummytranslater.presentation;
 
+import android.view.KeyEvent;
+
+import com.jakewharton.rxbinding2.InitialValueObservable;
+import com.jakewharton.rxbinding2.widget.TextViewTextChangeEvent;
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.network.TranslatorService;
 import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;
@@ -11,7 +15,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -27,7 +31,7 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     @Inject
     TranslatorService mTranslatorService;
     private TranslationView mView;
-    private Disposable mDisposable;
+    private CompositeDisposable mDisposable;
 
     @Override
     public void bind(TranslationView view) {
@@ -37,7 +41,8 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
 
     @Override
     public void startObserveTextChanges(final Observable<CharSequence> observable) {
-        mDisposable = observable
+        verifyDisposable();
+        mDisposable.add(observable
                 .filter(s -> s.length() > INPUT_MIN)
                 .debounce(INPUT_TIMEOUT, TimeUnit.MILLISECONDS, Schedulers.io())
                 .switchMap(s -> mTranslatorService.translate("en-ru", s.toString()))
@@ -47,8 +52,9 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
                             //restart subscription
                             stopObserveTextChanges();
                             startObserveTextChanges(observable);
-                            e.printStackTrace();}
-                );
+                            e.printStackTrace();
+                        }
+                ));
     }
 
     @Override
@@ -59,7 +65,21 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     }
 
     @Override
+    public void startObserveTextChangesCompleted(Observable<KeyEvent> observable) {
+        verifyDisposable();
+        mDisposable.add(observable
+                .filter(e -> e.getKeyCode() == KeyEvent.KEYCODE_ENTER)
+                .subscribe((res) -> mView.onTextInputStop(res)));
+    }
+
+    @Override
     public void destroy() {
         App.clearNetworkComponent();
+    }
+
+    private void verifyDisposable() {
+        if (mDisposable == null || mDisposable.isDisposed()) {
+            mDisposable = new CompositeDisposable();
+        }
     }
 }

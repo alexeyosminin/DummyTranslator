@@ -26,18 +26,26 @@ public final class RealmTranslationDataStore implements TranslationDataStore<Rec
     }
 
     @Override
-    public void add(RecentModel item) {
-
+    public Observable<RecentModel> add(RecentModel item) {
+        return Observable.create(e -> {
+            mRealm.beginTransaction();
+            RealmRecentModel realmRecentModel = RealmRecentModel.toDbModel(mRealm, item);
+            mRealm.commitTransaction();
+            e.onNext(realmRecentModel.fromDbModel());
+            e.onComplete();
+        });
     }
 
     @Override
-    public void update(RecentModel item) {
-
+    public Observable<RecentModel> update(RecentModel item) {
+        //TODO: rework!
+        return Observable.just(item);
     }
 
     @Override
-    public void remove(RecentModel item) {
-
+    public Observable<RecentModel> remove(RecentModel item) {
+        //TODO: rework!
+        return Observable.just(item);
     }
 
     @Override

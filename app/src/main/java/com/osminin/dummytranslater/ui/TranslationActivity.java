@@ -2,10 +2,15 @@ package com.osminin.dummytranslater.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding2.view.RxView;
+import com.jakewharton.rxbinding2.widget.RxTextSwitcher;
 import com.jakewharton.rxbinding2.widget.RxTextView;
+import com.jakewharton.rxbinding2.widget.TextViewTextChangeEvent;
 import com.osminin.dummytranslater.R;
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;
@@ -45,6 +50,7 @@ public final class TranslationActivity extends BaseActivity implements Translati
     protected void onResume() {
         super.onResume();
         mPresenter.startObserveTextChanges(RxTextView.textChanges(mTranslationInput));
+        mPresenter.startObserveTextChangesCompleted(RxView.keys(mTranslationInput));
     }
 
     @Override
@@ -67,5 +73,10 @@ public final class TranslationActivity extends BaseActivity implements Translati
             resText = str + "\n";
         }
         mTranslationResult.setText(resText);
+    }
+
+    @Override
+    public void onTextInputStop(KeyEvent event) {
+        supportFinishAfterTransition();
     }
 }
