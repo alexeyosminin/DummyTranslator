@@ -7,11 +7,16 @@ import com.osminin.dummytranslater.models.TranslationModel;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+
 /**
  * TODO: Add a class header comment!
  */
 
 public interface TranslationView {
-    void onTextTranslated(List<String> text);
-    void onTextInputStop(TranslationModel model);
+    Observable<CharSequence> inputTextChanges();
+    Observable<KeyEvent> softKeyEvents();
+
+    Observable<TranslationModel> onTextTranslated(TranslationModel model);
+    Observable<TranslationModel> onTextInputStop(TranslationModel model);
 }

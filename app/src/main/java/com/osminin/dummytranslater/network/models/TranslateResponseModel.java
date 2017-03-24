@@ -48,9 +48,7 @@ public class TranslateResponseModel {
 
     public TranslationModel fromNetworkModel() {
         TranslationModel model = new TranslationModel();
-        if (text != null && !text.isEmpty()) {
-            model.setPrimaryText(text.get(0));
-        }
+        model.setTranslations(text);
         return model;
     }
 }

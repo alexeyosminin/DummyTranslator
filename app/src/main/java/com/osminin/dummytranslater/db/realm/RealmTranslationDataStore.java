@@ -27,13 +27,8 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
 
     @Override
     public Observable<TranslationModel> add(TranslationModel item) {
-        return Observable.create(e -> {
-            mRealm.beginTransaction();
-            RealmRecentModel realmRecentModel = RealmRecentModel.toDbModel(mRealm, item);
-            mRealm.commitTransaction();
-            e.onNext(realmRecentModel.fromDbModel());
-            e.onComplete();
-        });
+        return Observable.just(item)
+                .doOnNext(this::addItem);
     }
 
     @Override
@@ -56,5 +51,11 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
                 .subscribeOn(Schedulers.io())
                 .map(item -> item.fromDbModel())
                 .toList();
+    }
+
+    private void addItem(TranslationModel item) {
+        mRealm.beginTransaction();
+        RealmRecentModel.toDbModel(mRealm, item);
+        mRealm.commitTransaction();
     }
 }

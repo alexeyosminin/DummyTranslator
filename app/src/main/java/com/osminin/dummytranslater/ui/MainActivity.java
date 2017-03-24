@@ -79,7 +79,7 @@ public class MainActivity extends BaseActivity implements MainView {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 100 && resultCode == RESULT_OK) {
             TranslationModel model = data.getParcelableExtra("res");
-            mTranslationField.setText(model.getPrimaryText());
+            mTranslationField.setText(model.getTranslations().get(0));
         }
     }
 

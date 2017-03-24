@@ -3,14 +3,37 @@ package com.osminin.dummytranslater.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by osminin on 3/21/2017.
  */
 
 public class TranslationModel implements Parcelable {
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<TranslationModel> CREATOR = new Parcelable.Creator<TranslationModel>() {
+        @Override
+        public TranslationModel createFromParcel(Parcel in) {
+            return new TranslationModel(in);
+        }
+
+        @Override
+        public TranslationModel[] newArray(int size) {
+            return new TranslationModel[size];
+        }
+    };
     private String mPrimaryText;
     private String mSecondaryText;
+    private List<String> mTranslations;
     private boolean isFavorite;
+
+    public TranslationModel(String primaryText, String secondaryText, List<String> translations, boolean isFavorite) {
+        mPrimaryText = primaryText;
+        mSecondaryText = secondaryText;
+        mTranslations = translations;
+        this.isFavorite = isFavorite;
+    }
 
     public TranslationModel() {
     }
@@ -19,6 +42,18 @@ public class TranslationModel implements Parcelable {
         mPrimaryText = primaryText;
         mSecondaryText = secondaryText;
         this.isFavorite = isFavorite;
+    }
+
+    protected TranslationModel(Parcel in) {
+        mPrimaryText = in.readString();
+        mSecondaryText = in.readString();
+        if (in.readByte() == 0x01) {
+            mTranslations = new ArrayList<String>();
+            in.readList(mTranslations, String.class.getClassLoader());
+        } else {
+            mTranslations = null;
+        }
+        isFavorite = in.readByte() != 0x00;
     }
 
     public String getPrimaryText() {
@@ -45,11 +80,14 @@ public class TranslationModel implements Parcelable {
         isFavorite = favorite;
     }
 
-    protected TranslationModel(Parcel in) {
-        mPrimaryText = in.readString();
-        mSecondaryText = in.readString();
-        isFavorite = in.readByte() != 0x00;
+    public List<String> getTranslations() {
+        return mTranslations;
     }
+
+    public void setTranslations(List<String> translations) {
+        mTranslations = translations;
+    }
+
 
     @Override
     public int describeContents() {
@@ -60,19 +98,12 @@ public class TranslationModel implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mPrimaryText);
         dest.writeString(mSecondaryText);
+        if (mTranslations == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(mTranslations);
+        }
         dest.writeByte((byte) (isFavorite ? 0x01 : 0x00));
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TranslationModel> CREATOR = new Parcelable.Creator<TranslationModel>() {
-        @Override
-        public TranslationModel createFromParcel(Parcel in) {
-            return new TranslationModel(in);
-        }
-
-        @Override
-        public TranslationModel[] newArray(int size) {
-            return new TranslationModel[size];
-        }
-    };
 }

@@ -2,11 +2,8 @@ package com.osminin.dummytranslater.presentation;
 
 import android.view.KeyEvent;
 
-import com.jakewharton.rxbinding2.InitialValueObservable;
-import com.jakewharton.rxbinding2.widget.TextViewTextChangeEvent;
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
-import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.network.TranslatorService;
 import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;
 import com.osminin.dummytranslater.ui.TranslationView;
@@ -15,8 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -37,6 +32,8 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     private TranslationView mView;
     private CompositeDisposable mDisposable;
 
+    private String mTranslationDirection;
+
     @Override
     public void bind(TranslationView view) {
         mView = view;
@@ -44,37 +41,34 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     }
 
     @Override
-    public void startObserveTextChanges(final Observable<CharSequence> textObservable,
-                                        final Observable<KeyEvent> keysObservable) {
+    public void startObserveUiChanges() {
         verifyDisposable();
-        mDisposable.add(textObservable
+        mDisposable.add(mView.inputTextChanges()
                 .filter(charSequence -> charSequence.length() > INPUT_MIN)
                 .debounce(INPUT_TIMEOUT, TimeUnit.MILLISECONDS, Schedulers.io())
                 .map(CharSequence::toString)
-                .switchMap(string -> mTranslatorService.translate("en-ru", string))
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(responseModel -> mView.onTextTranslated(responseModel.getText()))
-                .observeOn(Schedulers.io())
-                .sample(keysObservable
-                        .filter(e -> e.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+                .switchMap(string -> mTranslatorService.translate(mTranslationDirection, string))
                 .map(responseModel -> responseModel.fromNetworkModel())
-                .switchMap(translationModel -> mDataStore.add(translationModel))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(translationModel -> mView.onTextInputStop(translationModel),
-                        e -> {
-                            //restart subscription
-                            stopObserveTextChanges();
-                            startObserveTextChanges(textObservable, keysObservable);
-                            e.printStackTrace();
-                        }
-                ));
+                .switchMap(mView::onTextTranslated)
+                .observeOn(Schedulers.io())
+                .sample(mView.softKeyEvents()
+                        .filter(e -> e.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+                .switchMap(mDataStore::add)
+                .switchMap(mView::onTextInputStop)
+                .doOnError(this::handleError)
+                .subscribe());
     }
 
     @Override
-    public void stopObserveTextChanges() {
+    public void stopObserveUiChanges() {
         if (!mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
+    }
+
+    @Override
+    public void setTranslationDirection(String direction) {
+        mTranslationDirection = direction;
     }
 
     @Override
@@ -86,5 +80,12 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
         if (mDisposable == null || mDisposable.isDisposed()) {
             mDisposable = new CompositeDisposable();
         }
+    }
+
+    private void handleError(Throwable t) {
+        //restart subscription
+        /*stopObserveUiChanges();
+        startObserveUiChanges();
+        e.printStackTrace();*/
     }
 }

@@ -15,8 +15,9 @@ import io.reactivex.Observable;
  */
 
 public interface TranslationPresenter extends BasePresenter<TranslationView> {
-    void startObserveTextChanges(Observable<CharSequence> textObservable,
-                                 Observable<KeyEvent> keysObservable);
-    void stopObserveTextChanges();
+    void startObserveUiChanges();
+    void stopObserveUiChanges();
+
+    void setTranslationDirection(String direction);
     void destroy();
 }
