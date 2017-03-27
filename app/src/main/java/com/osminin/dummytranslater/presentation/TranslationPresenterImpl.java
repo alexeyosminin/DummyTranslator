@@ -1,9 +1,11 @@
 package com.osminin.dummytranslater.presentation;
 
+import android.util.Pair;
 import android.view.KeyEvent;
 
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
+import com.osminin.dummytranslater.models.Languages;
 import com.osminin.dummytranslater.network.TranslatorService;
 import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;
 import com.osminin.dummytranslater.ui.TranslationView;
@@ -32,7 +34,7 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     private TranslationView mView;
     private CompositeDisposable mDisposable;
 
-    private String mTranslationDirection;
+    private Pair<Languages, Languages> mTranslationDirection;
 
     @Override
     public void bind(TranslationView view) {
@@ -48,7 +50,6 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
                 .debounce(INPUT_TIMEOUT, TimeUnit.MILLISECONDS, Schedulers.io())
                 .map(CharSequence::toString)
                 .switchMap(string -> mTranslatorService.translate(mTranslationDirection, string))
-                .map(responseModel -> responseModel.fromNetworkModel())
                 .switchMap(mView::onTextTranslated)
                 .observeOn(Schedulers.io())
                 .sample(mView.softKeyEvents()
@@ -67,7 +68,7 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     }
 
     @Override
-    public void setTranslationDirection(String direction) {
+    public void setTranslationDirection(Pair<Languages, Languages> direction) {
         mTranslationDirection = direction;
     }
 
@@ -84,8 +85,10 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
 
     private void handleError(Throwable t) {
         //restart subscription
-        /*stopObserveUiChanges();
-        startObserveUiChanges();
-        e.printStackTrace();*/
+        if (java.io.InterruptedIOException.class.getName().equals(t.getClass().getName())) {
+            stopObserveUiChanges();
+            startObserveUiChanges();
+        }
+        t.printStackTrace();
     }
 }

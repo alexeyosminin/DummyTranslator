@@ -1,7 +1,10 @@
 package com.osminin.dummytranslater.network.yapi;
 
 import android.util.Log;
+import android.util.Pair;
 
+import com.osminin.dummytranslater.models.Languages;
+import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.network.TranslatorService;
 import com.osminin.dummytranslater.network.models.TranslateResponseModel;
 
@@ -26,9 +29,15 @@ public final class YTranslatorServiceImpl implements TranslatorService {
     }
 
     @Override
-    public Observable<TranslateResponseModel> translate(String lang, String text) {
+    public Observable<TranslationModel> translate(Pair<Languages, Languages> translationDirection, String text) {
+        String textDirection = translationDirection.first.getCode()
+                .concat("-")
+                .concat(translationDirection.second.getCode());
         return mTranslatorService
-                .translate(lang, API_KEY, text)
+                .translate(textDirection, API_KEY, text)
+                .map(responseModel -> responseModel.fromNetworkModel())
+                .doOnNext(model -> model.setPrimaryText(text))
+                .doOnNext(model -> model.setTranslationDirection(translationDirection))
                 .unsubscribeOn(Schedulers.io());
     }
 }

@@ -13,16 +13,23 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.osminin.dummytranslater.R;
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.models.TranslationModel;
+import com.osminin.dummytranslater.models.Languages;
 import com.osminin.dummytranslater.presentation.interfaces.MainPresenter;
 import com.osminin.dummytranslater.ui.base.BaseActivity;
 import com.osminin.dummytranslater.ui.custom.CustomAdapter;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
 
 public class MainActivity extends BaseActivity implements MainView {
+    public static final String TRANSLATION_MODEL_KEY = "translation_model_extra";
+    private static final int INPUT_TIMEOUT = 300;
+    private static final int REQUEST_TRANSLATION_ACTIVITY = 100;
 
     @Inject
     MainPresenter mPresenter;
@@ -33,6 +40,7 @@ public class MainActivity extends BaseActivity implements MainView {
     RecyclerView mRecyclerView;
 
     private CustomAdapter mAdapter;
+    private TranslationModel mTranslationModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +55,8 @@ public class MainActivity extends BaseActivity implements MainView {
     @Override
     protected void onStart() {
         super.onStart();
-        mPresenter.startObserveTextInput(RxView.clicks(mTranslationField));
+        mPresenter.startObserveUiEvents();
+        //TODO: refactor
         mPresenter.startObserveRecentClicks(mAdapter.getViewClickedObservable());
     }
 
@@ -68,18 +77,31 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
+    public Observable<Object> textInputObservable() {
+        return RxView.clicks(mTranslationField)
+                .throttleFirst(INPUT_TIMEOUT,  TimeUnit.MILLISECONDS);
+    }
+
+    @Override
     public void showTranslationView() {
         Intent intent = new Intent(this, TranslationActivity.class);
         ActivityOptionsCompat options = ActivityOptionsCompat.
                 makeSceneTransitionAnimation(this, mTranslationField, getString(R.string.main_translate_transition));
-        startActivityForResult(intent, 100, options.toBundle());
+        if (mTranslationModel == null) {
+            mTranslationModel = new TranslationModel();
+            mTranslationModel.setTranslationDirection(Languages.ENGLISH, Languages.RUSSIAN);
+        }
+        intent.putExtra(TRANSLATION_MODEL_KEY, mTranslationModel);
+        startActivityForResult(intent, REQUEST_TRANSLATION_ACTIVITY, options.toBundle());
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 100 && resultCode == RESULT_OK) {
-            TranslationModel model = data.getParcelableExtra("res");
-            mTranslationField.setText(model.getTranslations().get(0));
+        if (requestCode == REQUEST_TRANSLATION_ACTIVITY && resultCode == RESULT_OK) {
+            TranslationModel model = data.getParcelableExtra(TRANSLATION_MODEL_KEY);
+            //TODO: refactor
+            mTranslationModel = model;
+            mTranslationField.setText(model.getPrimaryText());
         }
     }
 

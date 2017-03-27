@@ -1,5 +1,6 @@
 package com.osminin.dummytranslater.presentation;
 
+import com.jakewharton.rxbinding2.internal.Notification;
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
 import com.osminin.dummytranslater.models.TranslationModel;
@@ -33,10 +34,9 @@ public final class MainPresenterImpl implements MainPresenter {
     }
 
     @Override
-    public void startObserveTextInput(Observable<Object> observable) {
+    public void startObserveUiEvents() {
         verifyDisposable();
-        mDisposable.add(observable
-                .debounce(100, TimeUnit.MILLISECONDS)
+        mDisposable.add(mView.textInputObservable()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(o -> mView.showTranslationView()));
     }

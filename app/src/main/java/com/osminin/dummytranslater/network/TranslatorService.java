@@ -1,6 +1,9 @@
 package com.osminin.dummytranslater.network;
 
-import com.osminin.dummytranslater.network.models.TranslateResponseModel;
+import android.util.Pair;
+
+import com.osminin.dummytranslater.models.Languages;
+import com.osminin.dummytranslater.models.TranslationModel;
 
 import io.reactivex.Observable;
 
@@ -9,5 +12,6 @@ import io.reactivex.Observable;
  */
 
 public interface TranslatorService {
-    Observable<TranslateResponseModel> translate(String lang, String text);
+    Observable<TranslationModel> translate(Pair<Languages, Languages> translationDirection,
+                                           String text);
 }
