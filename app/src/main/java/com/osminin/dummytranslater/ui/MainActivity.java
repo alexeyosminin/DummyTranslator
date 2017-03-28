@@ -7,6 +7,7 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.view.RxView;
@@ -26,6 +27,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 
+import static android.R.attr.data;
+
 public class MainActivity extends BaseActivity implements MainView {
     public static final String TRANSLATION_MODEL_KEY = "translation_model_extra";
     private static final int INPUT_TIMEOUT = 300;
@@ -34,13 +37,15 @@ public class MainActivity extends BaseActivity implements MainView {
     @Inject
     MainPresenter mPresenter;
 
-    @BindView(R.id.main_edit_text)
-    TextView mTranslationField;
     @BindView(R.id.main_recent_list)
     RecyclerView mRecyclerView;
 
     private CustomAdapter mAdapter;
     private TranslationModel mTranslationModel;
+    private View mInputContainer;
+    private TextView mInputField;
+    private View mTranslationContainer;
+    private TextView mTranslationField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +53,8 @@ public class MainActivity extends BaseActivity implements MainView {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         App.getAppComponent().inject(this);
-        mPresenter.bind(this);
         initList();
+        mPresenter.bind(this);
     }
 
     @Override
@@ -73,12 +78,13 @@ public class MainActivity extends BaseActivity implements MainView {
 
     @Override
     public void onTextTranslated(String text) {
-        mTranslationField.setText(text);
+        mInputField.setText(text);
     }
 
     @Override
     public Observable<Object> textInputObservable() {
-        return RxView.clicks(mTranslationField)
+        return Observable
+                .merge(RxView.clicks(mInputContainer), RxView.clicks(mInputField))
                 .throttleFirst(INPUT_TIMEOUT,  TimeUnit.MILLISECONDS);
     }
 
@@ -86,9 +92,10 @@ public class MainActivity extends BaseActivity implements MainView {
     public void showTranslationView() {
         Intent intent = new Intent(this, TranslationActivity.class);
         ActivityOptionsCompat options = ActivityOptionsCompat.
-                makeSceneTransitionAnimation(this, mTranslationField, getString(R.string.main_translate_transition));
+                makeSceneTransitionAnimation(this, mInputContainer, getString(R.string.main_translate_transition));
         if (mTranslationModel == null) {
             mTranslationModel = new TranslationModel();
+            //TODO:
             mTranslationModel.setTranslationDirection(Languages.ENGLISH, Languages.RUSSIAN);
         }
         intent.putExtra(TRANSLATION_MODEL_KEY, mTranslationModel);
@@ -99,9 +106,17 @@ public class MainActivity extends BaseActivity implements MainView {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TRANSLATION_ACTIVITY && resultCode == RESULT_OK) {
             TranslationModel model = data.getParcelableExtra(TRANSLATION_MODEL_KEY);
-            //TODO: refactor
             mTranslationModel = model;
-            mTranslationField.setText(model.getPrimaryText());
+            mInputField.setText(model.getPrimaryText());
+            //Translation Card
+            if (mTranslationContainer != null) {
+                mAdapter.removeTranslationCard(mTranslationContainer);
+            }
+            mTranslationContainer = View.inflate(this, R.layout.translation_card_layout, null);
+            mTranslationField = ButterKnife.findById(mTranslationContainer, R.id.translate_result);
+            //TODO:
+            mTranslationField.setText(mTranslationModel.getTranslations().get(0));
+            mAdapter.addTranslationCard(mTranslationContainer);
         }
     }
 
@@ -115,5 +130,9 @@ public class MainActivity extends BaseActivity implements MainView {
         }
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
+        //Input card
+        mInputContainer = View.inflate(this, R.layout.input_card_layout, null);
+        mInputField = ButterKnife.findById(mInputContainer, R.id.main_edit_text);
+        mAdapter.addInputCard(mInputContainer);
     }
 }

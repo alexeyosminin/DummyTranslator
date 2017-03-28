@@ -22,16 +22,13 @@ import io.reactivex.subjects.PublishSubject;
  */
 
 public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public static final int TYPE_INPUT = 111;
+    public static final int TYPE_TRANSLATION = 222;
+    public static final int TYPE_RECENT = 333;
     private static final int CLICK_TIMEOUT = 500;
-    public static final int TYPE_HEADER = 111;
-    public static final int TYPE_FOOTER = 222;
-    public static final int TYPE_ITEM = 333;
-    //our items
-    List<TranslationModel> items = new ArrayList<>();
-    //headers
-    List<View> headers = new ArrayList<>();
-    //footers
-    List<View> footers = new ArrayList<>();
+    private List<TranslationModel> mRecents = new ArrayList<>();
+    private List<View> mInput = new ArrayList<>();
+    private List<View> mTranslation = new ArrayList<>();
 
     private PublishSubject<TranslationModel> mViewClickSubject = PublishSubject.create();
 
@@ -41,19 +38,18 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int type) {
-        //if our position is one of our items (this comes from getItemViewType(int position) below)
         RecyclerView.ViewHolder res;
         View view;
-        if (type == TYPE_ITEM) {
+        if (type == TYPE_RECENT) {
             view = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.favorites_item_layout, viewGroup, false);
-            res = new GenericViewHolder(view);
+                    .inflate(R.layout.recent_card_layout, viewGroup, false);
+            res = new RecentViewHolder(view);
             //else we have a header/footer
         } else {
             //create a new framelayout, or inflate from a resource
             view = new FrameLayout(viewGroup.getContext());
             //make sure it fills the space
-            view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             res = new HeaderFooterViewHolder(view);
         }
         return res;
@@ -62,24 +58,24 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder vh, int position) {
         //check what type of view our position is
-        if (position < headers.size()) {
-            View v = headers.get(position);
+        if (position < mInput.size()) {
+            View v = mInput.get(position);
             //add our view to a header view and display it
             prepareHeaderFooter((HeaderFooterViewHolder) vh, v);
-        } else if (position >= headers.size() + items.size()) {
-            View v = footers.get(position - items.size() - headers.size());
+        } else if (position >= mInput.size() + mRecents.size()) {
+            View v = mTranslation.get(position - mRecents.size() - mInput.size());
             //add oru view to a footer view and display it
             prepareHeaderFooter((HeaderFooterViewHolder) vh, v);
         } else {
-            //it's one of our items, display as required
-            prepareGeneric((GenericViewHolder) vh, position - headers.size());
+            //it's one of our mRecents, display as required
+            prepareGeneric((RecentViewHolder) vh, position - mInput.size());
         }
     }
 
     @Override
     public int getItemCount() {
-        //make sure the adapter knows to look for all our items, headers, and footers
-        return headers.size() + items.size() + footers.size();
+        //make sure the adapter knows to look for all our mRecents, mInput, and mTranslation
+        return mInput.size() + mRecents.size() + mTranslation.size();
     }
 
     private void prepareHeaderFooter(HeaderFooterViewHolder vh, View view) {
@@ -88,8 +84,8 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         vh.base.addView(view);
     }
 
-    private void prepareGeneric(GenericViewHolder vh, int position) {
-        TranslationModel recentItem = items.get(position);
+    private void prepareGeneric(RecentViewHolder vh, int position) {
+        TranslationModel recentItem = mRecents.get(position);
         RxView.clicks(vh.itemView)
                 .throttleFirst(CLICK_TIMEOUT, TimeUnit.MILLISECONDS)
                 .map(aVoid -> recentItem)
@@ -98,60 +94,65 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public int getItemViewType(int position) {
-        //check what type our position is, based on the assumption that the order is headers > items > footers
-        if (position < headers.size()) {
-            return TYPE_HEADER;
-        } else if (position >= headers.size() + items.size()) {
-            return TYPE_FOOTER;
+        //check what type our position is, based on the assumption that the order is mInput > mRecents > mTranslation
+        if (position < mInput.size()) {
+            return TYPE_INPUT;
+        } else if (position >= mInput.size() + mRecents.size()) {
+            return TYPE_TRANSLATION;
         }
-        return TYPE_ITEM;
+        return TYPE_RECENT;
     }
 
     //add a header to the adapter
-    public void addHeader(View header) {
-        if (!headers.contains(header)) {
-            headers.add(header);
+    public void addInputCard(View header) {
+        if (!mInput.contains(header)) {
+            mInput.add(header);
             //animate
-            notifyItemInserted(headers.size() - 1);
+            notifyItemInserted(mInput.size() - 1);
         }
     }
 
-    //remove a header from the adapter
-    public void removeHeader(View header) {
-        if (headers.contains(header)) {
+    //remove a inputCard from the adapter
+    public void removeInputCard(View inputCard) {
+        if (mInput.contains(inputCard)) {
             //animate
-            notifyItemRemoved(headers.indexOf(header));
-            headers.remove(header);
-            if (header.getParent() != null) {
-                ((ViewGroup) header.getParent()).removeView(header);
+            notifyItemRemoved(mInput.indexOf(inputCard));
+            mInput.remove(inputCard);
+            if (inputCard.getParent() != null) {
+                ((ViewGroup) inputCard.getParent()).removeView(inputCard);
             }
         }
     }
 
-    //add a footer to the adapter
-    public void addFooter(View footer) {
-        if (!footers.contains(footer)) {
-            footers.add(footer);
+    //add a translationCard to the adapter
+    public void addTranslationCard(View translationCard) {
+        if (!mTranslation.contains(translationCard)) {
+            mTranslation.add(translationCard);
             //animate
-            notifyItemInserted(headers.size() + items.size() + footers.size() - 1);
+            notifyItemInserted(mInput.size() + mRecents.size() + mTranslation.size() - 1);
         }
     }
 
-    //remove a footer from the adapter
-    public void removeFooter(View footer) {
-        if (footers.contains(footer)) {
+    //remove a translationCard from the adapter
+    public void removeTranslationCard(View translationCard) {
+        if (mTranslation.contains(translationCard)) {
             //animate
-            notifyItemRemoved(headers.size() + items.size() + footers.indexOf(footer));
-            footers.remove(footer);
-            if (footer.getParent() != null) {
-                ((ViewGroup) footer.getParent()).removeView(footer);
+            notifyItemRemoved(mInput.size() + mRecents.size() + mTranslation.indexOf(translationCard));
+            mTranslation.remove(translationCard);
+            if (translationCard.getParent() != null) {
+                ((ViewGroup) translationCard.getParent()).removeView(translationCard);
             }
         }
     }
 
-    public static class GenericViewHolder extends RecyclerView.ViewHolder {
+    public void setRecents(List<TranslationModel> recents) {
+        this.mRecents = recents;
+        notifyDataSetChanged();
+    }
 
-        public GenericViewHolder(View itemView) {
+    public static class RecentViewHolder extends RecyclerView.ViewHolder {
+
+        public RecentViewHolder(View itemView) {
             super(itemView);
         }
     }

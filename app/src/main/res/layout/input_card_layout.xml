@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    card_view:cardCornerRadius="@dimen/cards_corner_radius"
+    card_view:cardElevation="@dimen/cards_elevation"
+    card_view:cardUseCompatPadding="true"
+    card_view:contentPadding="@dimen/cards_content_padding">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/main_edit_text"
+            style="@android:style/Widget.Material.EditText"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:hint="@string/main_tap_to_enter"
+            card_view:layout_constraintBottom_toBottomOf="parent" card_view:layout_constraintLeft_toLeftOf="parent"
+            card_view:layout_constraintRight_toRightOf="parent" card_view:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="8dp"/>
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp" android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            card_view:layout_constraintBottom_toTopOf="@+id/main_edit_text" card_view:layout_constraintLeft_toLeftOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent"/>
+        <Spinner
+            android:id="@+id/spinner2"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp" card_view:layout_constraintBottom_toTopOf="@+id/main_edit_text"
+            card_view:layout_constraintRight_toRightOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent" android:layout_marginEnd="8dp"/>
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp" android:background="@android:color/transparent"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintLeft_toLeftOf="parent" card_view:layout_constraintRight_toRightOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/main_edit_text" card_view:srcCompat="@drawable/ic_mic_black_24dp"
+            android:layout_marginStart="8dp" android:layout_marginEnd="8dp"/>
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            card_view:srcCompat="@drawable/ic_volume_up_black_24dp"
+            android:layout_marginLeft="8dp"
+            card_view:layout_constraintLeft_toLeftOf="parent" android:layout_marginTop="8dp"
+            card_view:layout_constraintTop_toBottomOf="@+id/main_edit_text"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="8dp"/>
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.v7.widget.CardView>

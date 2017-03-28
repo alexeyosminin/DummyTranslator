@@ -85,7 +85,8 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
 
     private void handleError(Throwable t) {
         //restart subscription
-        if (java.io.InterruptedIOException.class.getName().equals(t.getClass().getName())) {
+        if (t instanceof java.io.InterruptedIOException ||
+                t instanceof java.net.SocketTimeoutException) {
             stopObserveUiChanges();
             startObserveUiChanges();
         }

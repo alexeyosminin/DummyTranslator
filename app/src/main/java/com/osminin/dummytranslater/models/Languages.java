@@ -3,6 +3,8 @@ package com.osminin.dummytranslater.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.osminin.dummytranslater.R;
+
 /**
  * TODO: Add a class header comment!
  */
@@ -11,7 +13,7 @@ public enum Languages implements Parcelable {
     AZERBAIJAN("az", 0),
     ALBANIAN("sq", 0),
     AMHARIC("am", 0),
-    ENGLISH("en", 0),
+    ENGLISH("en", R.string.language_english),
     ARABIC("ar", 0),
     ARMENIAN("hy", 0),
     AFRIKAANS("af", 0),
@@ -68,7 +70,7 @@ public enum Languages implements Parcelable {
     POLISH("pl", 0),
     PORTUGUESE("pt", 0),
     ROMANIAN("ro", 0),
-    RUSSIAN("ru", 0),
+    RUSSIAN("ru", R.string.language_russian),
     CEBUANO("ceb", 0),
     SERBIAN("sr", 0),
     SINHALA("si", 0),

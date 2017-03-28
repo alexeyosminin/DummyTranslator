@@ -23,7 +23,7 @@ import static com.osminin.dummytranslater.Config.HOST;
 
 @Module
 public final class NetworkModule {
-    private static final int REQUESTS_TIMEOUT = 1;
+    private static final int REQUESTS_TIMEOUT = 20;
     private static final TimeUnit REQUESTS_TIMEOUT_UNITS = TimeUnit.SECONDS;
 
 

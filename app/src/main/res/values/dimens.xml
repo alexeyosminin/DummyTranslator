@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="cards_elevation">2dp</dimen>
+    <dimen name="cards_corner_radius">1dp</dimen>
+    <dimen name="cards_content_padding">16dp</dimen>
+</resources>
