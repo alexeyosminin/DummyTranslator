@@ -29,15 +29,15 @@ public final class YTranslatorServiceImpl implements TranslatorService {
     }
 
     @Override
-    public Observable<TranslationModel> translate(Pair<Languages, Languages> translationDirection, String text) {
-        String textDirection = translationDirection.first.getCode()
+    public Observable<TranslationModel> translate(TranslationModel model) {
+        String textDirection = model.getTranslationDirection().first.getCode()
                 .concat("-")
-                .concat(translationDirection.second.getCode());
+                .concat(model.getTranslationDirection().second.getCode());
         return mTranslatorService
-                .translate(textDirection, API_KEY, text)
+                .translate(textDirection, API_KEY, model.getPrimaryText())
                 .map(responseModel -> responseModel.fromNetworkModel())
-                .doOnNext(model -> model.setPrimaryText(text))
-                .doOnNext(model -> model.setTranslationDirection(translationDirection))
+                .doOnNext(m -> m.setPrimaryText(model.getPrimaryText()))
+                .doOnNext(m -> m.setTranslationDirection(model.getTranslationDirection()))
                 .unsubscribeOn(Schedulers.io());
     }
 }

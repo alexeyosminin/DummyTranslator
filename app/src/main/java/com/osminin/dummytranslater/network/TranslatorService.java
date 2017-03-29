@@ -12,6 +12,5 @@ import io.reactivex.Observable;
  */
 
 public interface TranslatorService {
-    Observable<TranslationModel> translate(Pair<Languages, Languages> translationDirection,
-                                           String text);
+    Observable<TranslationModel> translate(TranslationModel model);
 }

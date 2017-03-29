@@ -16,7 +16,11 @@ import io.reactivex.Observable;
 public interface TranslationView {
     Observable<CharSequence> inputTextChanges();
     Observable<KeyEvent> softKeyEvents();
+    Observable<Object> crossButtonClicks();
 
-    Observable<TranslationModel> onTextTranslated(TranslationModel model);
-    Observable<TranslationModel> onTextInputStop(TranslationModel model);
+    Observable<TranslationModel> onTextTranslated(TranslationModel item);
+    Observable<TranslationModel> onTextInputStop(TranslationModel item);
+    <T> Observable<T> showProgress(T item);
+    <T> Observable<T> showCrossButton(T item);
+    <T> Observable<T> clearInputOutputFields(T item);
 }

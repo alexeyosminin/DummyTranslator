@@ -99,10 +99,10 @@ public class MainActivity extends BaseActivity implements MainView {
                 makeSceneTransitionAnimation(this, mInputContainer, getString(R.string.main_translate_transition));
         if (mTranslationModel == null) {
             mTranslationModel = new TranslationModel();
-            Languages from = Languages.values()[mFromSpinner.getSelectedItemPosition()];
-            Languages to = Languages.values()[mToSpinner.getSelectedItemPosition()];
-            mTranslationModel.setTranslationDirection(from, to);
         }
+        Languages from = Languages.values()[mFromSpinner.getSelectedItemPosition()];
+        Languages to = Languages.values()[mToSpinner.getSelectedItemPosition()];
+        mTranslationModel.setTranslationDirection(from, to);
         intent.putExtra(TRANSLATION_MODEL_KEY, mTranslationModel);
         startActivityForResult(intent, REQUEST_TRANSLATION_ACTIVITY, options.toBundle());
     }
@@ -111,6 +111,7 @@ public class MainActivity extends BaseActivity implements MainView {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TRANSLATION_ACTIVITY && resultCode == RESULT_OK) {
             TranslationModel model = data.getParcelableExtra(TRANSLATION_MODEL_KEY);
+            //TODO: replace model to presenter
             mTranslationModel = model;
             mInputField.setText(model.getPrimaryText());
             //remove old one Translation Card, update and add updated one
@@ -118,8 +119,11 @@ public class MainActivity extends BaseActivity implements MainView {
                 mAdapter.removeTranslationCard(mTranslationContainer);
             }
             //TODO:
-            mTranslationField.setText(mTranslationModel.getTranslations().get(0));
-            mAdapter.addTranslationCard(mTranslationContainer);
+            if (mTranslationModel.getTranslations() != null
+                    && !mTranslationModel.getTranslations().isEmpty()) {
+                mTranslationField.setText(mTranslationModel.getTranslations().get(0));
+                mAdapter.addTranslationCard(mTranslationContainer);
+            }
         }
     }
 

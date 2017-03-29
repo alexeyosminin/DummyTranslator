@@ -22,12 +22,34 @@
     <TextView
         android:id="@+id/translate_result"
         style="@android:style/Widget.Material.EditText"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/translate_edit_text"/>
+
+    <ImageView
+        android:id="@+id/translate_cross_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintRight_toRightOf="@+id/translate_edit_text"
+        app:layout_constraintTop_toTopOf="@+id/translate_edit_text"
+        app:srcCompat="@drawable/ic_close_black_24dp"/>
+
+    <ProgressBar
+        android:id="@+id/translate_progress"
+        style="?android:attr/progressBarStyleSmallTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/translate_edit_text"
+        app:layout_constraintRight_toRightOf="@+id/translate_cross_button"
+        app:layout_constraintTop_toTopOf="@+id/translate_edit_text"
+        app:layout_constraintVertical_bias="0.0"/>
 
 </android.support.constraint.ConstraintLayout>

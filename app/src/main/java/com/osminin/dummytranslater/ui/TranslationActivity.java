@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -38,11 +39,13 @@ public final class TranslationActivity extends BaseActivity implements Translati
     EditText mTranslationInput;
     @BindView(R.id.translate_result)
     TextView mTranslationResult;
+    @BindView(R.id.translate_cross_button)
+    View mCrossButton;
+    @BindView(R.id.translate_progress)
+    View mProgress;
 
     @BindString(R.string.main_tap_to_enter)
     String mDefaultInput;
-
-    private TranslationModel mTranslationModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,9 +54,9 @@ public final class TranslationActivity extends BaseActivity implements Translati
         ButterKnife.bind(this);
         App.getAppComponent().inject(this);
         mPresenter.bind(this);
-        mTranslationModel = getIntent().getParcelableExtra(TRANSLATION_MODEL_KEY);
-        mPresenter.setTranslationDirection(mTranslationModel.getTranslationDirection());
-        String translationText = mTranslationModel.getPrimaryText();
+        TranslationModel translationModel = getIntent().getParcelableExtra(TRANSLATION_MODEL_KEY);
+        mPresenter.setTranslationModel(translationModel);
+        String translationText = translationModel.getPrimaryText();
         mTranslationInput.setText(translationText);
     }
 
@@ -84,13 +87,26 @@ public final class TranslationActivity extends BaseActivity implements Translati
     }
 
     @Override
+    public <T> Observable<T> showProgress(T item) {
+        return Observable.just(item)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(this::showProgressInternal);
+    }
+
+    @Override
+    public <T> Observable<T> showCrossButton(T item) {
+        return Observable.just(item)
+                .doOnNext(this::showCrossBtn);
+    }
+
+    @Override
     public Observable<CharSequence> inputTextChanges() {
         return RxTextView.textChanges(mTranslationInput);
     }
 
     @Override
     public Observable<KeyEvent> softKeyEvents() {
-        return  RxView.keys(mTranslationInput)
+        return RxView.keys(mTranslationInput)
                 .subscribeOn(AndroidSchedulers.mainThread());
     }
 
@@ -98,13 +114,23 @@ public final class TranslationActivity extends BaseActivity implements Translati
     public Observable<TranslationModel> onTextTranslated(TranslationModel model) {
         return Observable.just(model)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(this::setTranslatedText);
+                .doOnNext(this::setTranslatedText)
+                .doOnNext(this::hideProgress);
+    }
+
+    @Override
+    public Observable<Object> crossButtonClicks() {
+        return RxView.clicks(mCrossButton);
+    }
+
+    @Override
+    public <T> Observable<T> clearInputOutputFields(T item) {
+        return Observable.just(item)
+                .doOnNext(this::clearInputOutput);
     }
 
     private void setTranslatedText(TranslationModel model) {
         if (model.getTranslations() != null && !model.getTranslations().isEmpty()) {
-            //TODO: rework!
-            mTranslationModel = model;
             mTranslationResult.setText(model.getTranslations().get(0));
         }
     }
@@ -112,5 +138,28 @@ public final class TranslationActivity extends BaseActivity implements Translati
     private void finishAnimated(TranslationModel model) {
         setResult(RESULT_OK, new Intent().putExtra(TRANSLATION_MODEL_KEY, model));
         supportFinishAfterTransition();
+    }
+
+    private <T> void showProgressInternal(T item) {
+        mProgress.setVisibility(View.VISIBLE);
+        showCrossBtn(item);
+    }
+
+    private <T> void hideProgress(T item) {
+        mProgress.setVisibility(View.GONE);
+        showCrossBtn(item);
+    }
+
+    private <T> void clearInputOutput(T item) {
+        mTranslationInput.setText("");
+        mTranslationResult.setText("");
+    }
+
+    private <T> void showCrossBtn(T item) {
+        if (mTranslationInput.getText().length() != 0 && mProgress.getVisibility() == View.GONE) {
+            mCrossButton.setVisibility(View.VISIBLE);
+        } else {
+            mCrossButton.setVisibility(View.GONE);
+        }
     }
 }

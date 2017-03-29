@@ -7,6 +7,7 @@ import com.jakewharton.rxbinding2.InitialValueObservable;
 import com.jakewharton.rxbinding2.widget.TextViewAfterTextChangeEvent;
 import com.jakewharton.rxbinding2.widget.TextViewTextChangeEvent;
 import com.osminin.dummytranslater.models.Languages;
+import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.presentation.interfaces.base.BasePresenter;
 import com.osminin.dummytranslater.ui.TranslationView;
 
@@ -20,6 +21,6 @@ public interface TranslationPresenter extends BasePresenter<TranslationView> {
     void startObserveUiChanges();
     void stopObserveUiChanges();
 
-    void setTranslationDirection(Pair<Languages, Languages> direction);
+    void setTranslationModel(TranslationModel model);
     void destroy();
 }
