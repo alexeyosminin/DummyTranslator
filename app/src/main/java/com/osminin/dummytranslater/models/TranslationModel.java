@@ -77,6 +77,22 @@ public class TranslationModel implements Parcelable {
         mTranslationDirection = direction;
     }
 
+    public void setTranslationFrom(Languages from) {
+        if (mTranslationDirection == null) {
+            mTranslationDirection = new Pair<>(from, null);
+        } else {
+            mTranslationDirection = new Pair<>(from, mTranslationDirection.second);
+        }
+    }
+
+    public void setTranslationTo(Languages to) {
+        if (mTranslationDirection == null) {
+            mTranslationDirection = new Pair<>(null, to);
+        } else {
+            mTranslationDirection = new Pair<>(mTranslationDirection.first, to);
+        }
+    }
+
     public String getPrimaryText() {
         return mPrimaryText;
     }

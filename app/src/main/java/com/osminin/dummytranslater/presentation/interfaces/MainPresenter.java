@@ -12,6 +12,7 @@ import io.reactivex.Observable;
 
 public interface MainPresenter extends BasePresenter<MainView> {
     void startObserveUiEvents();
-    void startObserveRecentClicks(Observable<TranslationModel> observable);
     void stopObserveUiEvents();
+
+    void setTranslationModel(TranslationModel model);
 }

@@ -13,10 +13,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.view.RxView;
+import com.jakewharton.rxbinding2.widget.RxAdapterView;
 import com.osminin.dummytranslater.R;
 import com.osminin.dummytranslater.application.App;
-import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.models.Languages;
+import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.presentation.interfaces.MainPresenter;
 import com.osminin.dummytranslater.ui.base.BaseActivity;
 import com.osminin.dummytranslater.ui.custom.CustomAdapter;
@@ -41,7 +42,6 @@ public class MainActivity extends BaseActivity implements MainView {
     RecyclerView mRecyclerView;
 
     private CustomAdapter mAdapter;
-    private TranslationModel mTranslationModel;
 
     //card controls
     private View mInputContainer;
@@ -50,6 +50,7 @@ public class MainActivity extends BaseActivity implements MainView {
     private TextView mTranslationField;
     private Spinner mFromSpinner;
     private Spinner mToSpinner;
+    private View mReversTransDirectionBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +66,6 @@ public class MainActivity extends BaseActivity implements MainView {
     protected void onStart() {
         super.onStart();
         mPresenter.startObserveUiEvents();
-        //TODO: refactor
-        mPresenter.startObserveRecentClicks(mAdapter.getViewClickedObservable());
     }
 
     @Override
@@ -89,42 +88,73 @@ public class MainActivity extends BaseActivity implements MainView {
     public Observable<Object> textInputObservable() {
         return Observable
                 .merge(RxView.clicks(mInputContainer), RxView.clicks(mInputField))
-                .throttleFirst(INPUT_TIMEOUT,  TimeUnit.MILLISECONDS);
+                .throttleFirst(INPUT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public void showTranslationView() {
-        Intent intent = new Intent(this, TranslationActivity.class);
-        ActivityOptionsCompat options = ActivityOptionsCompat.
-                makeSceneTransitionAnimation(this, mInputContainer, getString(R.string.main_translate_transition));
-        if (mTranslationModel == null) {
-            mTranslationModel = new TranslationModel();
-        }
-        Languages from = Languages.values()[mFromSpinner.getSelectedItemPosition()];
-        Languages to = Languages.values()[mToSpinner.getSelectedItemPosition()];
-        mTranslationModel.setTranslationDirection(from, to);
-        intent.putExtra(TRANSLATION_MODEL_KEY, mTranslationModel);
-        startActivityForResult(intent, REQUEST_TRANSLATION_ACTIVITY, options.toBundle());
+    public Observable<Object> changeTranslationDirectionClicks() {
+        return RxView.clicks(mReversTransDirectionBtn)
+                .throttleFirst(INPUT_TIMEOUT, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public Observable<Languages> fromSpinnerObservable() {
+        return RxAdapterView.itemSelections(mFromSpinner)
+                .map(i -> Languages.values()[i]);
+    }
+
+    @Override
+    public Observable<Languages> toSpinnerObservable() {
+        return RxAdapterView.itemSelections(mToSpinner)
+                .map(i -> Languages.values()[i]);
+    }
+
+    @Override
+    public Observable<TranslationModel> getRecentItemsClicks() {
+        return mAdapter.getViewClickedObservable();
+    }
+
+    @Override
+    public <T> Observable<T> changeTransDirection(T item) {
+        //TODO:
+        return Observable.just(item);
+    }
+
+    @Override
+    public Observable<TranslationModel> showTranslationView(TranslationModel model) {
+        return Observable.just(model)
+                .doOnNext(this::launchTranslationView);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TRANSLATION_ACTIVITY && resultCode == RESULT_OK) {
             TranslationModel model = data.getParcelableExtra(TRANSLATION_MODEL_KEY);
-            //TODO: replace model to presenter
-            mTranslationModel = model;
+            mPresenter.setTranslationModel(model);
+            //TODO: replace logic to presenter
             mInputField.setText(model.getPrimaryText());
             //remove old one Translation Card, update and add updated one
             if (mTranslationContainer != null) {
                 mAdapter.removeTranslationCard(mTranslationContainer);
             }
-            //TODO:
-            if (mTranslationModel.getTranslations() != null
-                    && !mTranslationModel.getTranslations().isEmpty()) {
-                mTranslationField.setText(mTranslationModel.getTranslations().get(0));
+            if (model.getTranslations() != null
+                    && !model.getTranslations().isEmpty()) {
+                mTranslationField.setText(model.getTranslations().get(0));
                 mAdapter.addTranslationCard(mTranslationContainer);
             }
         }
+    }
+
+    private void launchTranslationView(TranslationModel model) {
+        Intent intent = new Intent(this, TranslationActivity.class);
+        ActivityOptionsCompat options = ActivityOptionsCompat.
+                makeSceneTransitionAnimation(this, mInputContainer, getString(R.string.main_translate_transition));
+        //TODO: replace to presenter
+        Languages from = Languages.values()[mFromSpinner.getSelectedItemPosition()];
+        Languages to = Languages.values()[mToSpinner.getSelectedItemPosition()];
+        model.setTranslationDirection(from, to);
+        intent.putExtra(TRANSLATION_MODEL_KEY, model);
+        startActivityForResult(intent, REQUEST_TRANSLATION_ACTIVITY, options.toBundle());
     }
 
     private void initList() {
@@ -156,5 +186,10 @@ public class MainActivity extends BaseActivity implements MainView {
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mFromSpinner.setAdapter(spinnerArrayAdapter);
         mToSpinner.setAdapter(spinnerArrayAdapter);
+        initReversTransDirectionBtn();
+    }
+
+    private void initReversTransDirectionBtn() {
+        mReversTransDirectionBtn = ButterKnife.findById(mTranslationContainer, R.id.input_reverse_direction);
     }
 }
