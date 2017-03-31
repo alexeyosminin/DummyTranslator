@@ -7,6 +7,7 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -29,6 +30,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 public class MainActivity extends BaseActivity implements MainView {
     public static final String TRANSLATION_MODEL_KEY = "translation_model_extra";
@@ -52,6 +54,8 @@ public class MainActivity extends BaseActivity implements MainView {
     private Spinner mToSpinner;
     private View mReversTransDirectionBtn;
 
+    private PublishSubject<TranslationModel> mActivityResultSubject;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +63,14 @@ public class MainActivity extends BaseActivity implements MainView {
         ButterKnife.bind(this);
         App.getAppComponent().inject(this);
         initList();
+        mActivityResultSubject = PublishSubject.create();
         mPresenter.bind(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mActivityResultSubject.onComplete();
     }
 
     @Override
@@ -76,7 +87,7 @@ public class MainActivity extends BaseActivity implements MainView {
 
     @Override
     public void showError() {
-
+        Log.d("", "");
     }
 
     @Override
@@ -115,6 +126,11 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
+    public Observable<TranslationModel> onActivityResult() {
+        return mActivityResultSubject;
+    }
+
+    @Override
     public <T> Observable<T> changeTransDirection(T item) {
         //TODO:
         return Observable.just(item);
@@ -127,21 +143,23 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
+    public Observable<TranslationModel> setPrimaryText(TranslationModel model) {
+        return Observable.just(model)
+                .doOnNext(m -> mInputField.setText(m.getPrimaryText()));
+    }
+
+    @Override
+    public Observable<TranslationModel> setTranslationText(TranslationModel model) {
+        return Observable.just(model)
+                .doOnNext(this::addTranslationCard)
+                .doOnNext(m -> mTranslationField.setText(m.getTranslations().get(0)));
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TRANSLATION_ACTIVITY && resultCode == RESULT_OK) {
             TranslationModel model = data.getParcelableExtra(TRANSLATION_MODEL_KEY);
-            mPresenter.setTranslationModel(model);
-            //TODO: replace logic to presenter
-            mInputField.setText(model.getPrimaryText());
-            //remove old one Translation Card, update and add updated one
-            if (mTranslationContainer != null) {
-                mAdapter.removeTranslationCard(mTranslationContainer);
-            }
-            if (model.getTranslations() != null
-                    && !model.getTranslations().isEmpty()) {
-                mTranslationField.setText(model.getTranslations().get(0));
-                mAdapter.addTranslationCard(mTranslationContainer);
-            }
+            mActivityResultSubject.onNext(model);
         }
     }
 
@@ -149,10 +167,6 @@ public class MainActivity extends BaseActivity implements MainView {
         Intent intent = new Intent(this, TranslationActivity.class);
         ActivityOptionsCompat options = ActivityOptionsCompat.
                 makeSceneTransitionAnimation(this, mInputContainer, getString(R.string.main_translate_transition));
-        //TODO: replace to presenter
-        Languages from = Languages.values()[mFromSpinner.getSelectedItemPosition()];
-        Languages to = Languages.values()[mToSpinner.getSelectedItemPosition()];
-        model.setTranslationDirection(from, to);
         intent.putExtra(TRANSLATION_MODEL_KEY, model);
         startActivityForResult(intent, REQUEST_TRANSLATION_ACTIVITY, options.toBundle());
     }
@@ -190,6 +204,13 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     private void initReversTransDirectionBtn() {
-        mReversTransDirectionBtn = ButterKnife.findById(mTranslationContainer, R.id.input_reverse_direction);
+        mReversTransDirectionBtn = ButterKnife.findById(mInputContainer, R.id.input_reverse_direction);
+    }
+
+    private <T> void addTranslationCard(T item) {
+        if (mTranslationContainer != null) {
+            mAdapter.removeTranslationCard(mTranslationContainer);
+            mAdapter.addTranslationCard(mTranslationContainer);
+        }
     }
 }

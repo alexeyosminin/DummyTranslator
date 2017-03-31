@@ -27,6 +27,7 @@ public final class MainPresenterImpl implements MainPresenter {
     @Override
     public void bind(MainView view) {
         mView = view;
+        mTranslationModel = new TranslationModel();
         App.plusDbComponent().inject(this);
     }
 
@@ -34,19 +35,27 @@ public final class MainPresenterImpl implements MainPresenter {
     public void startObserveUiEvents() {
         verifyDisposable();
         mDisposable.add(mView.textInputObservable()
-                .observeOn(AndroidSchedulers.mainThread())
                 .map(o -> mTranslationModel)
-                .defaultIfEmpty(new TranslationModel())
-                .subscribe(mView::showTranslationView));
+                .switchMap(mView::showTranslationView)
+                .subscribe());
 
         mDisposable.add(mView.changeTranslationDirectionClicks()
                 .subscribe(mView::changeTransDirection));
 
         mDisposable.add(mView.fromSpinnerObservable()
-                .subscribe(mTranslationModel::setTranslationFrom));
+                .subscribe(l -> mTranslationModel.setTranslationFrom(l)));
 
         mDisposable.add(mView.toSpinnerObservable()
-                .subscribe(mTranslationModel::setTranslationTo));
+                .subscribe(l -> mTranslationModel.setTranslationTo(l)));
+
+        mDisposable.add(mView.onActivityResult()
+                .doOnNext(model -> mTranslationModel = model)
+                .switchMap(mView::setPrimaryText)
+                .filter(m -> m.getTranslations() != null
+                        && !m.getTranslations().isEmpty())
+                .switchMap(mView::setTranslationText)
+                .doOnError(m -> mView.showError())
+                .subscribe());
     }
 
     @Override
@@ -54,11 +63,6 @@ public final class MainPresenterImpl implements MainPresenter {
         if (!mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
-    }
-
-    @Override
-    public void setTranslationModel(TranslationModel model) {
-        mTranslationModel = model;
     }
 
     private void verifyDisposable() {

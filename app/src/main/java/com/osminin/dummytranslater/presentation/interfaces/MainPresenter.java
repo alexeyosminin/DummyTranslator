@@ -13,6 +13,4 @@ import io.reactivex.Observable;
 public interface MainPresenter extends BasePresenter<MainView> {
     void startObserveUiEvents();
     void stopObserveUiEvents();
-
-    void setTranslationModel(TranslationModel model);
 }

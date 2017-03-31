@@ -80,6 +80,7 @@
             card_view:srcCompat="@drawable/ic_compare_arrows_black_24dp"
             card_view:layout_constraintTop_toTopOf="parent" android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
+            android:padding="8dp"
             card_view:layout_constraintBottom_toTopOf="@+id/input_edit_text"
             android:layout_marginLeft="8dp" card_view:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginRight="8dp" card_view:layout_constraintRight_toRightOf="parent"/>
