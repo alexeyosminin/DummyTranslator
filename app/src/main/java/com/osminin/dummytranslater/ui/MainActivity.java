@@ -31,11 +31,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
+import oxim.digital.rx2anim.RxAnimations;
+
+import static oxim.digital.rx2anim.RxAnimations.animateTogether;
+import static oxim.digital.rx2anim.RxAnimations.fadeIn;
+import static oxim.digital.rx2anim.RxAnimations.fadeOut;
 
 public class MainActivity extends BaseActivity implements MainView {
     public static final String TRANSLATION_MODEL_KEY = "translation_model_extra";
     private static final int INPUT_TIMEOUT = 300;
     private static final int REQUEST_TRANSLATION_ACTIVITY = 100;
+    private static final int ANIMATION_DURATION = 200;
 
     @Inject
     MainPresenter mPresenter;
@@ -87,6 +93,7 @@ public class MainActivity extends BaseActivity implements MainView {
 
     @Override
     public void showError() {
+        //TODO:
         Log.d("", "");
     }
 
@@ -132,8 +139,15 @@ public class MainActivity extends BaseActivity implements MainView {
 
     @Override
     public <T> Observable<T> changeTransDirection(T item) {
-        //TODO:
-        return Observable.just(item);
+        int pos = mFromSpinner.getSelectedItemPosition();
+        return Observable.just(item)
+                .doOnNext(i -> RxAnimations.animateTogether(fadeOut(mFromSpinner, ANIMATION_DURATION),
+                        fadeOut(mToSpinner, ANIMATION_DURATION)
+                                .doOnComplete(() -> mFromSpinner.setSelection(mToSpinner.getSelectedItemPosition()))
+                                .doOnComplete(() -> mToSpinner.setSelection(pos))
+                                .concatWith(animateTogether(fadeIn(mFromSpinner, ANIMATION_DURATION),
+                                        fadeIn(mToSpinner, ANIMATION_DURATION)))
+                ).subscribe());
     }
 
     @Override

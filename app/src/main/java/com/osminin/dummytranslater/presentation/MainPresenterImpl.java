@@ -40,7 +40,8 @@ public final class MainPresenterImpl implements MainPresenter {
                 .subscribe());
 
         mDisposable.add(mView.changeTranslationDirectionClicks()
-                .subscribe(mView::changeTransDirection));
+                .switchMap(mView::changeTransDirection)
+                .subscribe());
 
         mDisposable.add(mView.fromSpinnerObservable()
                 .subscribe(l -> mTranslationModel.setTranslationFrom(l)));
