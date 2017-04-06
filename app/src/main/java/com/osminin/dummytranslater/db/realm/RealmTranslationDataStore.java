@@ -12,6 +12,8 @@ import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * Created by osminin on 3/22/2017.
  */
@@ -22,7 +24,6 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
 
     public RealmTranslationDataStore(Context context) {
         Realm.init(context);
-        mRealm = Realm.getDefaultInstance();
     }
 
     @Override
@@ -44,18 +45,21 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
     }
 
     @Override
-    public Single<List<TranslationModel>> queryAll() {
+    public Observable<TranslationModel> queryAll() {
         return Observable.fromIterable(mRealm.
                 where(RealmRecentModel.class)
                 .findAll())
-                .subscribeOn(Schedulers.io())
-                .map(item -> item.fromDbModel())
-                .toList();
+                .map(m -> m.fromDbModel());
     }
 
     private void addItem(TranslationModel item) {
         mRealm.beginTransaction();
         RealmRecentModel.toDbModel(mRealm, item);
         mRealm.commitTransaction();
+    }
+
+    public Observable init() {
+        return Observable.empty()
+                .doOnSubscribe(disposable -> {mRealm = Realm.getDefaultInstance();});
     }
 }

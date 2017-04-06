@@ -59,8 +59,7 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
                 .doOnError(this::handleError)
                 .subscribe(model -> mModel = model));
         //start observe 'Enter' key button on virtual keyboard
-        mDisposable.add(mView.softKeyEvents()
-                .filter(e -> e.getKeyCode() == KeyEvent.KEYCODE_ENTER)
+        mDisposable.add(mView.softEnterKeyEvents()
                 .map(e -> mModel)
                 .switchMap(mDataStore::add)
                 .switchMap(mView::onTextInputStop)
@@ -71,6 +70,13 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
                 .throttleFirst(INPUT_TIMEOUT, TimeUnit.MILLISECONDS)
                 .doOnNext(i -> updateModel(null, null))
                 .switchMap(mView::clearInputOutputFields)
+                .subscribe());
+
+        mDisposable.add(mView.backButtonClicks()
+                .throttleFirst(INPUT_TIMEOUT, TimeUnit.MILLISECONDS)
+                .map(e -> mModel)
+                .switchMap(mView::onTextInputStop)
+                .doOnError(this::handleError)
                 .subscribe());
     }
 

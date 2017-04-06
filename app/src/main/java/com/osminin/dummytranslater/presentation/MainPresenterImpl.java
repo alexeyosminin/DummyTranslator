@@ -1,5 +1,7 @@
 package com.osminin.dummytranslater.presentation;
 
+import android.util.Log;
+
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
 import com.osminin.dummytranslater.models.TranslationModel;
@@ -8,8 +10,10 @@ import com.osminin.dummytranslater.ui.MainView;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * TODO: Add a class header comment!
@@ -57,6 +61,7 @@ public final class MainPresenterImpl implements MainPresenter {
                 .switchMap(mView::setTranslationText)
                 .doOnError(m -> mView.showError())
                 .subscribe());
+        initDb();
     }
 
     @Override
@@ -64,6 +69,19 @@ public final class MainPresenterImpl implements MainPresenter {
         if (!mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
+    }
+
+    private void initDb() {
+        mDataStore.init()
+                .subscribeOn(Schedulers.io())
+                .doOnComplete(this::loadRecent)
+                .subscribe();
+    }
+
+    private void loadRecent() {
+        mDataStore.queryAll()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(i -> Log.d("", i.getPrimaryText() != null ? i.getPrimaryText() : "null"));
     }
 
     private void verifyDisposable() {

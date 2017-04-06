@@ -23,6 +23,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.subjects.PublishSubject;
 
 import static com.osminin.dummytranslater.ui.MainActivity.TRANSLATION_MODEL_KEY;
 
@@ -44,8 +45,7 @@ public final class TranslationActivity extends BaseActivity implements Translati
     @BindView(R.id.translate_progress)
     View mProgress;
 
-    @BindString(R.string.main_tap_to_enter)
-    String mDefaultInput;
+    private PublishSubject<Object> mBackButtonSubject;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,6 +58,7 @@ public final class TranslationActivity extends BaseActivity implements Translati
         mPresenter.setTranslationModel(translationModel);
         String translationText = translationModel.getPrimaryText();
         mTranslationInput.setText(translationText);
+        mBackButtonSubject = PublishSubject.create();
     }
 
     @Override
@@ -76,6 +77,12 @@ public final class TranslationActivity extends BaseActivity implements Translati
     protected void onDestroy() {
         super.onDestroy();
         mPresenter.destroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        mBackButtonSubject.onNext("");
     }
 
     @Override
@@ -105,8 +112,8 @@ public final class TranslationActivity extends BaseActivity implements Translati
     }
 
     @Override
-    public Observable<KeyEvent> softKeyEvents() {
-        return RxView.keys(mTranslationInput)
+    public Observable<KeyEvent> softEnterKeyEvents() {
+        return RxView.keys(mTranslationInput, e -> e.getKeyCode() == KeyEvent.KEYCODE_ENTER)
                 .subscribeOn(AndroidSchedulers.mainThread());
     }
 
@@ -121,6 +128,11 @@ public final class TranslationActivity extends BaseActivity implements Translati
     @Override
     public Observable<Object> crossButtonClicks() {
         return RxView.clicks(mCrossButton);
+    }
+
+    @Override
+    public Observable<Object> backButtonClicks() {
+        return mBackButtonSubject;
     }
 
     @Override

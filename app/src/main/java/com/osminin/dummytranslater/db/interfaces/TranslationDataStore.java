@@ -14,11 +14,13 @@ import io.reactivex.Single;
 // interface for getting Recent, Suggestions and Favorites
 public interface TranslationDataStore {
 
+    Observable init();
+
     Observable<TranslationModel> add(TranslationModel item);
 
     Observable<TranslationModel> update(TranslationModel item);
 
     Observable<TranslationModel> remove(TranslationModel item);
 
-    Single<List<TranslationModel>> queryAll();
+    Observable<TranslationModel> queryAll();
 }
