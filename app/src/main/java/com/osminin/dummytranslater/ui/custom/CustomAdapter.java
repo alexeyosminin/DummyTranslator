@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.view.RxView;
 import com.osminin.dummytranslater.R;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
@@ -69,6 +71,8 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         } else {
             //it's one of our mRecents, display as required
             prepareGeneric((RecentViewHolder) vh, position - mInput.size());
+            ((RecentViewHolder) vh).mPrimaryText
+                    .setText(mRecents.get(position - mInput.size() - mTranslation.size()).getPrimaryText());
         }
     }
 
@@ -150,10 +154,18 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         notifyDataSetChanged();
     }
 
+    public void addRecentItem(TranslationModel item) {
+        mRecents.add(item);
+        notifyItemInserted(mRecents.size() - 1);
+    }
+
     public static class RecentViewHolder extends RecyclerView.ViewHolder {
+
+        TextView mPrimaryText;
 
         public RecentViewHolder(View itemView) {
             super(itemView);
+            mPrimaryText = ButterKnife.findById(itemView, R.id.recent_primary_text);
         }
     }
 

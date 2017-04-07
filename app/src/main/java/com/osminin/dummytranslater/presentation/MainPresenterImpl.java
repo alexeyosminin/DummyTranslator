@@ -61,7 +61,11 @@ public final class MainPresenterImpl implements MainPresenter {
                 .switchMap(mView::setTranslationText)
                 .doOnError(m -> mView.showError())
                 .subscribe());
-        initDb();
+        mDisposable.add(loadRecent()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .switchMap(mView::addRecentItem)
+                .subscribe());
     }
 
     @Override
@@ -71,17 +75,11 @@ public final class MainPresenterImpl implements MainPresenter {
         }
     }
 
-    private void initDb() {
-        mDataStore.init()
-                .subscribeOn(Schedulers.io())
-                .doOnComplete(this::loadRecent)
-                .subscribe();
-    }
-
-    private void loadRecent() {
-        mDataStore.queryAll()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(i -> Log.d("", i.getPrimaryText() != null ? i.getPrimaryText() : "null"));
+    private Observable<TranslationModel> loadRecent() {
+        return mDataStore.open(mDataStore)
+                .switchMap(dataStore -> dataStore.queryAll())
+                .doOnComplete(() -> mDisposable.add(mDataStore.close(mDataStore).subscribe()))
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     private void verifyDisposable() {

@@ -27,4 +27,5 @@ public interface MainView extends BaseView {
     Observable<TranslationModel> showTranslationView(TranslationModel model);
     Observable<TranslationModel> setPrimaryText(TranslationModel model);
     Observable<TranslationModel> setTranslationText(TranslationModel model);
+    Observable<TranslationModel> addRecentItem(TranslationModel model);
 }

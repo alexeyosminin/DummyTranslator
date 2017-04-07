@@ -5,14 +5,11 @@ import android.content.Context;
 import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
 import com.osminin.dummytranslater.models.TranslationModel;
 
-import java.util.List;
-
 import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
+import io.realm.RealmQuery;
 
-import static java.util.stream.Collectors.toList;
+import static com.osminin.dummytranslater.db.realm.RealmRecentModel.toDbModel;
 
 /**
  * Created by osminin on 3/22/2017.
@@ -24,6 +21,19 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
 
     public RealmTranslationDataStore(Context context) {
         Realm.init(context);
+    }
+
+    @Override
+    public <T> Observable<T> open(T item) {
+        return Observable.fromCallable(() -> Realm.getDefaultInstance())
+                .doOnNext(realm -> mRealm = realm)
+                .switchMap(realm -> Observable.just(item));
+    }
+
+    @Override
+    public <T> Observable<T> close(T item) {
+        return Observable.just(item)
+                .doOnNext(i -> mRealm.close());
     }
 
     @Override
@@ -46,20 +56,15 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
 
     @Override
     public Observable<TranslationModel> queryAll() {
-        return Observable.fromIterable(mRealm.
-                where(RealmRecentModel.class)
+        return Observable.fromIterable(mRealm.where(RealmRecentModel.class)
                 .findAll())
                 .map(m -> m.fromDbModel());
     }
 
     private void addItem(TranslationModel item) {
         mRealm.beginTransaction();
-        RealmRecentModel.toDbModel(mRealm, item);
+        RealmRecentModel model = RealmRecentModel.toDbModel(item);
+        mRealm.copyToRealmOrUpdate(model);
         mRealm.commitTransaction();
-    }
-
-    public Observable init() {
-        return Observable.empty()
-                .doOnSubscribe(disposable -> {mRealm = Realm.getDefaultInstance();});
     }
 }

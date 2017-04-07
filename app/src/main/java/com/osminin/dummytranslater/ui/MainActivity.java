@@ -170,6 +170,12 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
+    public Observable<TranslationModel> addRecentItem(TranslationModel model) {
+        return Observable.just(model)
+                .doOnNext(mAdapter::addRecentItem);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TRANSLATION_ACTIVITY && resultCode == RESULT_OK) {
             TranslationModel model = data.getParcelableExtra(TRANSLATION_MODEL_KEY);
@@ -199,7 +205,7 @@ public class MainActivity extends BaseActivity implements MainView {
         mInputContainer = View.inflate(this, R.layout.input_card_layout, null);
         mInputField = ButterKnife.findById(mInputContainer, R.id.input_edit_text);
         mAdapter.addInputCard(mInputContainer);
-        //Translation Card init
+        //Translation Card open
         mTranslationContainer = View.inflate(this, R.layout.translation_card_layout, null);
         mTranslationField = ButterKnife.findById(mTranslationContainer, R.id.translate_result);
         initSpinners();

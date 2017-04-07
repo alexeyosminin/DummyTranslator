@@ -60,8 +60,11 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
                 .subscribe(model -> mModel = model));
         //start observe 'Enter' key button on virtual keyboard
         mDisposable.add(mView.softEnterKeyEvents()
+                .filter(e -> e.getKeyCode() == KeyEvent.KEYCODE_ENTER)
                 .map(e -> mModel)
+                .switchMap(mDataStore::open)
                 .switchMap(mDataStore::add)
+                .switchMap(mDataStore::close)
                 .switchMap(mView::onTextInputStop)
                 .doOnError(this::handleError)
                 .subscribe());

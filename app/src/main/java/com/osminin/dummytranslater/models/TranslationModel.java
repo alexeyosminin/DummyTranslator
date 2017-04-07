@@ -46,6 +46,16 @@ public class TranslationModel implements Parcelable {
         this.isFavorite = isFavorite;
     }
 
+    public TranslationModel(String primaryText, String secondaryText, List<String> translations,
+                            boolean isFavorite, int from, int to) {
+        mPrimaryText = primaryText;
+        mSecondaryText = secondaryText;
+        mTranslations = translations;
+        this.isFavorite = isFavorite;
+        setTranslationFrom(Languages.values()[from]);
+        setTranslationTo(Languages.values()[to]);
+    }
+
     protected TranslationModel(Parcel in) {
         mPrimaryText = in.readString();
         mSecondaryText = in.readString();
