@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -64,13 +65,13 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             View v = mInput.get(position);
             //add our view to a header view and display it
             prepareHeaderFooter((HeaderFooterViewHolder) vh, v);
-        } else if (position >= mInput.size() + mRecents.size()) {
-            View v = mTranslation.get(position - mRecents.size() - mInput.size());
+        } else if (position >= mInput.size() && position < mTranslation.size() + mInput.size()) {
+            View v = mTranslation.get(position - mInput.size());
             //add oru view to a footer view and display it
             prepareHeaderFooter((HeaderFooterViewHolder) vh, v);
         } else {
             //it's one of our mRecents, display as required
-            prepareGeneric((RecentViewHolder) vh, position - mInput.size());
+            prepareGeneric((RecentViewHolder) vh, position - mInput.size() - mTranslation.size());
             ((RecentViewHolder) vh).mPrimaryText
                     .setText(mRecents.get(position - mInput.size() - mTranslation.size()).getPrimaryText());
         }
@@ -85,6 +86,10 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private void prepareHeaderFooter(HeaderFooterViewHolder vh, View view) {
         //empty out our FrameLayout and replace with our header/footer
         vh.base.removeAllViews();
+        ViewGroup parent = (ViewGroup) view.getParent();
+        if (parent != null) {
+            parent.removeView(view);
+        }
         vh.base.addView(view);
     }
 
@@ -101,10 +106,10 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         //check what type our position is, based on the assumption that the order is mInput > mRecents > mTranslation
         if (position < mInput.size()) {
             return TYPE_INPUT;
-        } else if (position >= mInput.size() + mRecents.size()) {
-            return TYPE_TRANSLATION;
+        } else if (position >= mInput.size() + mTranslation.size()) {
+            return TYPE_RECENT;
         }
-        return TYPE_RECENT;
+        return TYPE_TRANSLATION;
     }
 
     //add a header to the adapter
@@ -133,15 +138,15 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         if (!mTranslation.contains(translationCard)) {
             mTranslation.add(translationCard);
             //animate
-            notifyItemInserted(mInput.size() + mRecents.size() + mTranslation.size() - 1);
+            notifyItemInserted(mInput.size());
         }
     }
 
     //remove a translationCard from the adapter
     public void removeTranslationCard(View translationCard) {
-        if (mTranslation.contains(translationCard)) {
+        if (mTranslation.size() > 0) {
             //animate
-            notifyItemRemoved(mInput.size() + mRecents.size() + mTranslation.indexOf(translationCard));
+            notifyItemRemoved(mInput.size());
             mTranslation.remove(translationCard);
             if (translationCard.getParent() != null) {
                 ((ViewGroup) translationCard.getParent()).removeView(translationCard);
@@ -152,6 +157,12 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void setRecents(List<TranslationModel> recents) {
         this.mRecents = recents;
         notifyDataSetChanged();
+    }
+
+    public void clearRecent() {
+        int count = mRecents.size();
+        mRecents.clear();
+        notifyItemRangeRemoved(mInput.size() + mTranslation.size() - 1, count);
     }
 
     public void addRecentItem(TranslationModel item) {

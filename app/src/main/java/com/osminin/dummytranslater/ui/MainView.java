@@ -23,6 +23,7 @@ public interface MainView extends BaseView {
     Observable<TranslationModel> onActivityResult();
 
     <T> Observable<T> changeTransDirection(T item);
+    <T> Observable<T> clearRecentList(T item);
 
     Observable<TranslationModel> showTranslationView(TranslationModel model);
     Observable<TranslationModel> setPrimaryText(TranslationModel model);

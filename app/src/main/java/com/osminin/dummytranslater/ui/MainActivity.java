@@ -151,6 +151,12 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
+    public <T> Observable<T> clearRecentList(T item) {
+        return Observable.just(item)
+                .doOnNext(i -> mAdapter.clearRecent());
+    }
+
+    @Override
     public Observable<TranslationModel> showTranslationView(TranslationModel model) {
         return Observable.just(model)
                 .doOnNext(this::launchTranslationView);

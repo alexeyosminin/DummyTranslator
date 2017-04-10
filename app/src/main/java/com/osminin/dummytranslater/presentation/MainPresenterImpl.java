@@ -41,6 +41,7 @@ public final class MainPresenterImpl implements MainPresenter {
         mDisposable.add(mView.textInputObservable()
                 .map(o -> mTranslationModel)
                 .switchMap(mView::showTranslationView)
+                .switchMap(mView::clearRecentList)
                 .subscribe());
 
         mDisposable.add(mView.changeTranslationDirectionClicks()

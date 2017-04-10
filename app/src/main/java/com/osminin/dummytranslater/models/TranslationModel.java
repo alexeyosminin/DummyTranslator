@@ -29,15 +29,18 @@ public class TranslationModel implements Parcelable {
     private List<String> mTranslations;
     private boolean isFavorite;
     private Pair<Languages, Languages> mTranslationDirection;
+    private long mTimestamp;
 
     public TranslationModel(String primaryText, String secondaryText, List<String> translations, boolean isFavorite) {
         mPrimaryText = primaryText;
         mSecondaryText = secondaryText;
         mTranslations = translations;
         this.isFavorite = isFavorite;
+        mTimestamp = System.currentTimeMillis();
     }
 
     public TranslationModel() {
+        mTimestamp = System.currentTimeMillis();
     }
 
     public TranslationModel(String primaryText, String secondaryText, boolean isFavorite) {
@@ -47,13 +50,14 @@ public class TranslationModel implements Parcelable {
     }
 
     public TranslationModel(String primaryText, String secondaryText, List<String> translations,
-                            boolean isFavorite, int from, int to) {
+                            boolean isFavorite, int from, int to, long timestamp) {
         mPrimaryText = primaryText;
         mSecondaryText = secondaryText;
         mTranslations = translations;
         this.isFavorite = isFavorite;
         setTranslationFrom(Languages.values()[from]);
         setTranslationTo(Languages.values()[to]);
+        mTimestamp = timestamp;
     }
 
     protected TranslationModel(Parcel in) {
@@ -73,6 +77,7 @@ public class TranslationModel implements Parcelable {
         } else {
             mTranslationDirection = null;
         }
+        mTimestamp = in.readLong();
     }
 
     public Pair<Languages, Languages> getTranslationDirection() {
@@ -135,6 +140,13 @@ public class TranslationModel implements Parcelable {
         mTranslations = translations;
     }
 
+    public long getTimestamp() {
+        return mTimestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        mTimestamp = timestamp;
+    }
 
     @Override
     public int describeContents() {
@@ -159,5 +171,25 @@ public class TranslationModel implements Parcelable {
             dest.writeParcelable(mTranslationDirection.first, flags);
             dest.writeParcelable(mTranslationDirection.second, flags);
         }
+        dest.writeLong(mTimestamp);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TranslationModel that = (TranslationModel) o;
+
+        if (!mPrimaryText.equals(that.mPrimaryText)) return false;
+        return mTranslationDirection.equals(that.mTranslationDirection);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = mPrimaryText.hashCode();
+        result = 31 * result + mTranslationDirection.hashCode();
+        return result;
     }
 }

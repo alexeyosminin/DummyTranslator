@@ -29,6 +29,7 @@ public class RealmRecentModel implements RealmModel {
     private int mTranslateFrom;
     private int mTranslateTo;
     private boolean isFavorite;
+    private long mTimestamp;
 
     public RealmRecentModel() {
     }
@@ -41,7 +42,16 @@ public class RealmRecentModel implements RealmModel {
         realmRecentModel.setTranslateFrom(model.getTranslationDirection().first.ordinal());
         realmRecentModel.setTranslateTo(model.getTranslationDirection().second.ordinal());
         realmRecentModel.setFavorite(model.isFavorite());
+        realmRecentModel.setTimestamp(model.getTimestamp());
         return realmRecentModel;
+    }
+
+    public long getTimestamp() {
+        return mTimestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        mTimestamp = timestamp;
     }
 
     public String getPrimaryText() {
@@ -104,6 +114,7 @@ public class RealmRecentModel implements RealmModel {
                 getTranslations(),
                 isFavorite(),
                 getTranslateFrom(),
-                getTranslateTo());
+                getTranslateTo(),
+                getTimestamp());
     }
 }

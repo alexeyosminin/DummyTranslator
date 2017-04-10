@@ -7,9 +7,9 @@ import com.osminin.dummytranslater.models.TranslationModel;
 
 import io.reactivex.Observable;
 import io.realm.Realm;
-import io.realm.RealmQuery;
 
-import static com.osminin.dummytranslater.db.realm.RealmRecentModel.toDbModel;
+import static io.realm.Sort.ASCENDING;
+import static io.realm.Sort.DESCENDING;
 
 /**
  * Created by osminin on 3/22/2017.
@@ -57,7 +57,8 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
     @Override
     public Observable<TranslationModel> queryAll() {
         return Observable.fromIterable(mRealm.where(RealmRecentModel.class)
-                .findAll())
+                .findAll()
+                .sort("mTimestamp", DESCENDING))
                 .map(m -> m.fromDbModel());
     }
 
