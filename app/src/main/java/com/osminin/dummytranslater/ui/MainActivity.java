@@ -164,7 +164,10 @@ public class MainActivity extends BaseActivity implements MainView {
     @Override
     public <T> Observable<T> clearInputCard(T item) {
         return Observable.just(item)
-                .doOnNext();
+                .doOnNext(t -> {
+                    mInputField.setText("");
+                    mAdapter.removeTranslationCard(mTranslationContainer);
+                });
     }
 
     @Override

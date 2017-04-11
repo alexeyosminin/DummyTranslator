@@ -75,6 +75,7 @@ public final class MainPresenterImpl implements MainPresenter {
                 .subscribe());
         mDisposable.add(mView.clearInputObservable()
                 .switchMap(mView::clearInputCard)
+                .doOnNext(o -> clearTranslationModel())
                 .subscribe());
     }
 
@@ -102,5 +103,10 @@ public final class MainPresenterImpl implements MainPresenter {
         TranslationModel model = new TranslationModel();
         model.setTranslationDirection(Languages.ENGLISH, Languages.RUSSIAN);
         return model;
+    }
+
+    private void clearTranslationModel() {
+        mTranslationModel.setPrimaryText(null);
+        mTranslationModel.setTranslations(null);
     }
 }
