@@ -66,10 +66,15 @@ public final class MainPresenterImpl implements MainPresenter {
                 .first(getDefaultModel())
                 .toObservable()
                 .switchMap(mView::setDefaultTranslationDirection)
-                .doOnComplete(() -> {mDisposable.add(loadRecent()
-                        .subscribeOn(Schedulers.io())
-                        .switchMap(mView::addRecentItem)
-                        .subscribe());})
+                .doOnComplete(() -> {
+                    mDisposable.add(loadRecent()
+                            .subscribeOn(Schedulers.io())
+                            .switchMap(mView::addRecentItem)
+                            .subscribe());
+                })
+                .subscribe());
+        mDisposable.add(mView.clearInputObservable()
+                .switchMap(mView::clearInputCard)
                 .subscribe());
     }
 

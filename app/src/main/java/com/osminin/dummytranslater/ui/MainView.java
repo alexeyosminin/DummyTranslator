@@ -21,9 +21,11 @@ public interface MainView extends BaseView {
     Observable<Languages> toSpinnerObservable();
     Observable<TranslationModel> getRecentItemsClicks();
     Observable<TranslationModel> onActivityResult();
+    Observable<Object> clearInputObservable();
 
     <T> Observable<T> changeTransDirection(T item);
     <T> Observable<T> clearRecentList(T item);
+    <T> Observable<T> clearInputCard(T item);
 
     Observable<TranslationModel> showTranslationView(TranslationModel model);
     Observable<TranslationModel> setPrimaryText(TranslationModel model);

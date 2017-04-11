@@ -1,10 +1,8 @@
 package com.osminin.dummytranslater.ui;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -59,6 +57,7 @@ public class MainActivity extends BaseActivity implements MainView {
     private Spinner mFromSpinner;
     private Spinner mToSpinner;
     private View mReversTransDirectionBtn;
+    private View mClearInputBtn;
 
     private PublishSubject<TranslationModel> mActivityResultSubject;
 
@@ -138,6 +137,12 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
+    public Observable<Object> clearInputObservable() {
+        return RxView.clicks(mClearInputBtn)
+                .throttleFirst(INPUT_TIMEOUT, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
     public <T> Observable<T> changeTransDirection(T item) {
         int pos = mFromSpinner.getSelectedItemPosition();
         return Observable.just(item)
@@ -154,6 +159,12 @@ public class MainActivity extends BaseActivity implements MainView {
     public <T> Observable<T> clearRecentList(T item) {
         return Observable.just(item)
                 .doOnNext(i -> mAdapter.clearRecent());
+    }
+
+    @Override
+    public <T> Observable<T> clearInputCard(T item) {
+        return Observable.just(item)
+                .doOnNext();
     }
 
     @Override
@@ -215,10 +226,10 @@ public class MainActivity extends BaseActivity implements MainView {
         //Translation Card open
         mTranslationContainer = View.inflate(this, R.layout.translation_card_layout, null);
         mTranslationField = ButterKnife.findById(mTranslationContainer, R.id.translate_result);
-        initSpinners();
+        initInputCard();
     }
 
-    private void initSpinners() {
+    private void initInputCard() {
         mFromSpinner = ButterKnife.findById(mInputContainer, R.id.input_from_spinner);
         mToSpinner = ButterKnife.findById(mInputContainer, R.id.input_to_spinner);
 
@@ -227,11 +238,8 @@ public class MainActivity extends BaseActivity implements MainView {
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mFromSpinner.setAdapter(spinnerArrayAdapter);
         mToSpinner.setAdapter(spinnerArrayAdapter);
-        initReversTransDirectionBtn();
-    }
-
-    private void initReversTransDirectionBtn() {
         mReversTransDirectionBtn = ButterKnife.findById(mInputContainer, R.id.input_reverse_direction);
+        mClearInputBtn = ButterKnife.findById(mInputContainer, R.id.input_clear_btn);
     }
 
     private <T> void addTranslationCard(T item) {
