@@ -1,9 +1,8 @@
 package com.osminin.dummytranslater.presentation;
 
-import android.util.Log;
-
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
+import com.osminin.dummytranslater.models.Languages;
 import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.presentation.interfaces.MainPresenter;
 import com.osminin.dummytranslater.ui.MainView;
@@ -64,8 +63,13 @@ public final class MainPresenterImpl implements MainPresenter {
                 .subscribe());
         mDisposable.add(loadRecent()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .switchMap(mView::addRecentItem)
+                .first(getDefaultModel())
+                .toObservable()
+                .switchMap(mView::setDefaultTranslationDirection)
+                .doOnComplete(() -> {mDisposable.add(loadRecent()
+                        .subscribeOn(Schedulers.io())
+                        .switchMap(mView::addRecentItem)
+                        .subscribe());})
                 .subscribe());
     }
 
@@ -87,5 +91,11 @@ public final class MainPresenterImpl implements MainPresenter {
         if (mDisposable == null || mDisposable.isDisposed()) {
             mDisposable = new CompositeDisposable();
         }
+    }
+
+    private <T> TranslationModel getDefaultModel() {
+        TranslationModel model = new TranslationModel();
+        model.setTranslationDirection(Languages.ENGLISH, Languages.RUSSIAN);
+        return model;
     }
 }

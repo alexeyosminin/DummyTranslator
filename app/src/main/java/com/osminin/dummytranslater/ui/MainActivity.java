@@ -182,6 +182,12 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
+    public Observable<TranslationModel> setDefaultTranslationDirection(TranslationModel model) {
+        return Observable.just(model)
+                .doOnNext(this::setDefaultTranslation);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TRANSLATION_ACTIVITY && resultCode == RESULT_OK) {
             TranslationModel model = data.getParcelableExtra(TRANSLATION_MODEL_KEY);
@@ -199,12 +205,7 @@ public class MainActivity extends BaseActivity implements MainView {
 
     private void initList() {
         mAdapter = new CustomAdapter();
-        RecyclerView.LayoutManager layoutManager;
-        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            layoutManager = new GridLayoutManager(this, 2);
-        } else {
-            layoutManager = new LinearLayoutManager(this);
-        }
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
         //Input card
@@ -238,5 +239,10 @@ public class MainActivity extends BaseActivity implements MainView {
             mAdapter.removeTranslationCard(mTranslationContainer);
             mAdapter.addTranslationCard(mTranslationContainer);
         }
+    }
+
+    private void setDefaultTranslation(TranslationModel model) {
+        mFromSpinner.setSelection(model.getTranslationDirection().first.ordinal());
+        mToSpinner.setSelection(model.getTranslationDirection().second.ordinal());
     }
 }

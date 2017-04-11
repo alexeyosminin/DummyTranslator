@@ -167,7 +167,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public void addRecentItem(TranslationModel item) {
         mRecents.add(item);
-        notifyItemInserted(mRecents.size() - 1);
+        notifyItemChanged(mRecents.size() - 1);
     }
 
     public static class RecentViewHolder extends RecyclerView.ViewHolder {
