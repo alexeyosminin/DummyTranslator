@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -58,6 +59,7 @@ public class MainActivity extends BaseActivity implements MainView {
     private Spinner mToSpinner;
     private View mReversTransDirectionBtn;
     private View mClearInputBtn;
+    private ImageView mFavoriteStar;
 
     private PublishSubject<TranslationModel> mActivityResultSubject;
 
@@ -97,11 +99,6 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
-    public void onTextTranslated(String text) {
-        mInputField.setText(text);
-    }
-
-    @Override
     public Observable<Object> textInputObservable() {
         return Observable
                 .merge(RxView.clicks(mInputContainer), RxView.clicks(mInputField))
@@ -109,7 +106,7 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
-    public Observable<Object> changeTranslationDirectionClicks() {
+    public Observable<Object> translationDirectionObservable() {
         return RxView.clicks(mReversTransDirectionBtn)
                 .throttleFirst(INPUT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
@@ -127,18 +124,24 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
-    public Observable<TranslationModel> getRecentItemsClicks() {
+    public Observable<TranslationModel> recentItemsObservable() {
         return mAdapter.getViewClickedObservable();
     }
 
     @Override
-    public Observable<TranslationModel> onActivityResult() {
+    public Observable<TranslationModel> activityResultObservable() {
         return mActivityResultSubject;
     }
 
     @Override
     public Observable<Object> clearInputObservable() {
         return RxView.clicks(mClearInputBtn)
+                .throttleFirst(INPUT_TIMEOUT, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public Observable<Object> favoriteStarObservable() {
+        return RxView.clicks(mFavoriteStar)
                 .throttleFirst(INPUT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
@@ -171,6 +174,15 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
+    public Observable<Boolean> setFavorite(Boolean isFavorite) {
+        return Observable.just(isFavorite)
+                .doOnNext(f -> mFavoriteStar.setImageResource(
+                        isFavorite ? R.drawable.ic_star_orange_24dp
+                                : R.drawable.ic_star_border_white_24dp
+                ));
+    }
+
+    @Override
     public Observable<TranslationModel> showTranslationView(TranslationModel model) {
         return Observable.just(model)
                 .doOnNext(this::launchTranslationView);
@@ -183,10 +195,14 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
-    public Observable<TranslationModel> setTranslationText(TranslationModel model) {
+    public Observable<TranslationModel> setTranslation(TranslationModel model) {
         return Observable.just(model)
                 .doOnNext(this::addTranslationCard)
-                .doOnNext(m -> mTranslationField.setText(m.getTranslations().get(0)));
+                .doOnNext(m -> mTranslationField.setText(m.getTranslations().get(0)))
+                .doOnNext(m -> mFavoriteStar.setImageResource(
+                        m.isFavorite() ? R.drawable.ic_star_orange_24dp
+                                : R.drawable.ic_star_border_white_24dp
+                ));
     }
 
     @Override
@@ -223,16 +239,15 @@ public class MainActivity extends BaseActivity implements MainView {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
         //Input card
-        mInputContainer = View.inflate(this, R.layout.input_card_layout, null);
-        mInputField = ButterKnife.findById(mInputContainer, R.id.input_edit_text);
-        mAdapter.addInputCard(mInputContainer);
-        //Translation Card open
-        mTranslationContainer = View.inflate(this, R.layout.translation_card_layout, null);
-        mTranslationField = ButterKnife.findById(mTranslationContainer, R.id.translate_result);
         initInputCard();
+        //Translation card
+        initTranslationCard();
     }
 
     private void initInputCard() {
+        mInputContainer = View.inflate(this, R.layout.input_card_layout, null);
+        mInputField = ButterKnife.findById(mInputContainer, R.id.input_edit_text);
+        mAdapter.addInputCard(mInputContainer);
         mFromSpinner = ButterKnife.findById(mInputContainer, R.id.input_from_spinner);
         mToSpinner = ButterKnife.findById(mInputContainer, R.id.input_to_spinner);
 
@@ -243,6 +258,12 @@ public class MainActivity extends BaseActivity implements MainView {
         mToSpinner.setAdapter(spinnerArrayAdapter);
         mReversTransDirectionBtn = ButterKnife.findById(mInputContainer, R.id.input_reverse_direction);
         mClearInputBtn = ButterKnife.findById(mInputContainer, R.id.input_clear_btn);
+    }
+
+    private void initTranslationCard() {
+        mTranslationContainer = View.inflate(this, R.layout.translation_card_layout, null);
+        mTranslationField = ButterKnife.findById(mTranslationContainer, R.id.translate_result);
+        mFavoriteStar = ButterKnife.findById(mTranslationContainer, R.id.translate_favorite_star);
     }
 
     private <T> void addTranslationCard(T item) {

@@ -43,7 +43,7 @@ public final class MainPresenterImpl implements MainPresenter {
                 .switchMap(mView::clearRecentList)
                 .subscribe());
 
-        mDisposable.add(mView.changeTranslationDirectionClicks()
+        mDisposable.add(mView.translationDirectionObservable()
                 .switchMap(mView::changeTransDirection)
                 .subscribe());
 
@@ -53,22 +53,22 @@ public final class MainPresenterImpl implements MainPresenter {
         mDisposable.add(mView.toSpinnerObservable()
                 .subscribe(l -> mTranslationModel.setTranslationTo(l)));
 
-        mDisposable.add(mView.onActivityResult()
+        mDisposable.add(mView.activityResultObservable()
                 .doOnNext(model -> mTranslationModel = model)
                 .switchMap(mView::setPrimaryText)
                 .filter(m -> m.getTranslations() != null
                         && !m.getTranslations().isEmpty())
-                .switchMap(mView::setTranslationText)
+                .switchMap(mView::setTranslation)
                 .doOnError(m -> mView.showError())
                 .subscribe());
         mDisposable.add(loadRecent()
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.single())
                 .first(getDefaultModel())
                 .toObservable()
                 .switchMap(mView::setDefaultTranslationDirection)
                 .doOnComplete(() -> {
                     mDisposable.add(loadRecent()
-                            .subscribeOn(Schedulers.io())
+                            .subscribeOn(Schedulers.single())
                             .switchMap(mView::addRecentItem)
                             .subscribe());
                 })
@@ -76,6 +76,26 @@ public final class MainPresenterImpl implements MainPresenter {
         mDisposable.add(mView.clearInputObservable()
                 .switchMap(mView::clearInputCard)
                 .doOnNext(o -> clearTranslationModel())
+                .subscribe());
+        mDisposable.add(mView.recentItemsObservable()
+                .doOnNext(model -> {
+                    mTranslationModel = model;
+                })
+                .switchMap(mView::setDefaultTranslationDirection)
+                .switchMap(mView::setPrimaryText)
+                .switchMap(mView::setTranslation)
+                .subscribe());
+        mDisposable.add(mView.favoriteStarObservable()
+                .map(o -> !mTranslationModel.isFavorite())
+                .doOnNext(isFav -> {
+                    mTranslationModel.setFavorite(isFav);
+                })
+                .switchMap(mView::setFavorite)
+                .map(f -> mTranslationModel)
+                .observeOn(Schedulers.single())
+                .switchMap(mDataStore::open)
+                .switchMap(mDataStore::update)
+                .switchMap(mDataStore::close)
                 .subscribe());
     }
 

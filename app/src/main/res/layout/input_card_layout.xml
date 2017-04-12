@@ -67,9 +67,7 @@
         <ImageView
             android:id="@+id/input_clear_btn"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
+            android:padding="8dp"
             card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintRight_toRightOf="parent" card_view:layout_constraintTop_toBottomOf="@+id/input_edit_text"
             card_view:srcCompat="@drawable/ic_close_black_24dp"/>

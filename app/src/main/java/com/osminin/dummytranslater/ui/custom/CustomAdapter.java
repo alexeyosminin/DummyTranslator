@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -74,6 +73,9 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             prepareGeneric((RecentViewHolder) vh, position - mInput.size() - mTranslation.size());
             ((RecentViewHolder) vh).mPrimaryText
                     .setText(mRecents.get(position - mInput.size() - mTranslation.size()).getPrimaryText());
+            ((RecentViewHolder) vh).favoriteIcon.setVisibility(
+                    mRecents.get(position - mInput.size() - mTranslation.size()).isFavorite()
+                            ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -173,10 +175,12 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public static class RecentViewHolder extends RecyclerView.ViewHolder {
 
         TextView mPrimaryText;
+        View favoriteIcon;
 
         public RecentViewHolder(View itemView) {
             super(itemView);
             mPrimaryText = ButterKnife.findById(itemView, R.id.recent_primary_text);
+            favoriteIcon = ButterKnife.findById(itemView, R.id.recent_favorite_icon);
         }
     }
 

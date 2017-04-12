@@ -33,11 +33,10 @@
             card_view:layout_constraintLeft_toLeftOf="parent"
             card_view:layout_constraintTop_toBottomOf="@+id/translate_result"/>
         <ImageView
-            android:id="@+id/add_recent"
+            android:id="@+id/translate_favorite_star"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
+            android:padding="8dp"
             card_view:layout_constraintRight_toRightOf="parent"
             card_view:layout_constraintTop_toTopOf="parent" card_view:srcCompat="@drawable/ic_star_border_white_24dp"/>
         <ImageView

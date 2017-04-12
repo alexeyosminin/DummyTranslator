@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -62,9 +63,11 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
         mDisposable.add(mView.softEnterKeyEvents()
                 .filter(e -> e.getKeyCode() == KeyEvent.KEYCODE_ENTER)
                 .map(e -> mModel)
+                .observeOn(Schedulers.single())
                 .switchMap(mDataStore::open)
                 .switchMap(mDataStore::add)
                 .switchMap(mDataStore::close)
+                .observeOn(AndroidSchedulers.mainThread())
                 .switchMap(mView::onTextInputStop)
                 .doOnError(this::handleError)
                 .subscribe());
