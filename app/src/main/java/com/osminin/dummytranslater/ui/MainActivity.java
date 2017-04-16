@@ -89,6 +89,7 @@ public class MainActivity extends BaseActivity implements MainView {
     @Override
     protected void onStop() {
         super.onStop();
+        mAdapter.clearRecent();
         mPresenter.stopObserveUiEvents();
     }
 
