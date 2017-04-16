@@ -14,6 +14,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.osminin.dummytranslater.Config.MAX_RECENTS_COUNT;
+
 /**
  * TODO: Add a class header comment!
  */
@@ -66,12 +68,7 @@ public final class MainPresenterImpl implements MainPresenter {
                 .first(getDefaultModel())
                 .toObservable()
                 .switchMap(mView::setDefaultTranslationDirection)
-                .doOnComplete(() -> {
-                    mDisposable.add(loadRecent()
-                            .subscribeOn(Schedulers.single())
-                            .switchMap(mView::addRecentItem)
-                            .subscribe());
-                })
+                .doOnComplete(() -> reloadRecents())
                 .subscribe());
         mDisposable.add(mView.clearInputObservable()
                 .switchMap(mView::clearInputCard)
@@ -96,6 +93,9 @@ public final class MainPresenterImpl implements MainPresenter {
                 .switchMap(mDataStore::open)
                 .switchMap(mDataStore::update)
                 .switchMap(mDataStore::close)
+                .observeOn(AndroidSchedulers.mainThread())
+                .switchMap(mView::clearRecentList)
+                .doOnNext(translationModel -> reloadRecents())
                 .subscribe());
     }
 
@@ -128,5 +128,13 @@ public final class MainPresenterImpl implements MainPresenter {
     private void clearTranslationModel() {
         mTranslationModel.setPrimaryText(null);
         mTranslationModel.setTranslations(null);
+    }
+
+    private void reloadRecents() {
+        mDisposable.add(loadRecent()
+                .subscribeOn(Schedulers.single())
+                .take(MAX_RECENTS_COUNT)
+                .switchMap(mView::addRecentItem)
+                .subscribe());
     }
 }

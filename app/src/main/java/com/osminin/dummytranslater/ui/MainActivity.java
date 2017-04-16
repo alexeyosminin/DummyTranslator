@@ -212,6 +212,11 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
+    public Observable<TranslationModel> updateRecentItem(TranslationModel model) {
+        return null;
+    }
+
+    @Override
     public Observable<TranslationModel> setDefaultTranslationDirection(TranslationModel model) {
         return Observable.just(model)
                 .doOnNext(this::setDefaultTranslation);

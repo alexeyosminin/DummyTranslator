@@ -7,8 +7,9 @@ import com.osminin.dummytranslater.models.TranslationModel;
 
 import io.reactivex.Observable;
 import io.realm.Realm;
+import io.realm.RealmResults;
 
-import static io.realm.Sort.ASCENDING;
+import static com.osminin.dummytranslater.Config.MAX_RECENTS_COUNT;
 import static io.realm.Sort.DESCENDING;
 
 /**
@@ -16,7 +17,6 @@ import static io.realm.Sort.DESCENDING;
  */
 
 public final class RealmTranslationDataStore implements TranslationDataStore {
-
     private Realm mRealm;
 
     public RealmTranslationDataStore(Context context) {
@@ -33,6 +33,7 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
     @Override
     public <T> Observable<T> close(T item) {
         return Observable.just(item)
+                .doOnNext(this::trim)
                 .doOnNext(i -> mRealm.close());
     }
 
@@ -56,8 +57,7 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
     @Override
     public Observable<TranslationModel> queryAll() {
         return Observable.fromIterable(mRealm.where(RealmRecentModel.class)
-                .findAll()
-                .sort("mTimestamp", DESCENDING))
+                .findAllSorted(RealmRecentModel.getSortField(), DESCENDING))
                 .map(m -> m.fromDbModel());
     }
 
@@ -66,5 +66,19 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
         RealmRecentModel model = RealmRecentModel.toDbModel(item);
         mRealm.copyToRealmOrUpdate(model);
         mRealm.commitTransaction();
+    }
+
+    private <T> void trim(T item) {
+        RealmResults<RealmRecentModel> models = mRealm
+                .where(RealmRecentModel.class)
+                .equalTo(RealmRecentModel.getFavoriteField(), false)
+                .findAllSorted(RealmRecentModel.getSortField(), DESCENDING);
+        if (models.size() > MAX_RECENTS_COUNT) {
+            mRealm.beginTransaction();
+            for (int i = MAX_RECENTS_COUNT; i < models.size(); i++) {
+                models.deleteFromRealm(i);
+            }
+            mRealm.commitTransaction();
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.osminin.dummytranslater.models.TranslationModel;
 
+import java.util.Arrays;
 import java.util.List;
 
 import io.realm.RealmModel;
@@ -106,6 +107,14 @@ public class RealmRecentModel implements RealmModel {
 
     public void setTranslateTo(int translateTo) {
         mTranslateTo = translateTo;
+    }
+
+    public static String getSortField() {
+        return "mTimestamp";
+    }
+
+    public static String getFavoriteField() {
+        return "isFavorite";
     }
 
     public TranslationModel fromDbModel() {
