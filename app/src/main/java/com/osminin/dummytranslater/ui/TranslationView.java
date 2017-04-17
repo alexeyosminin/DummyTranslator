@@ -4,6 +4,7 @@ import android.view.KeyEvent;
 
 import com.jakewharton.rxbinding2.widget.TextViewTextChangeEvent;
 import com.osminin.dummytranslater.models.TranslationModel;
+import com.osminin.dummytranslater.ui.base.BaseView;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ import io.reactivex.Observable;
  * TODO: Add a class header comment!
  */
 
-public interface TranslationView {
+public interface TranslationView extends BaseView{
     Observable<CharSequence> inputTextChanges();
     Observable<KeyEvent> softEnterKeyEvents();
     Observable<Object> crossButtonClicks();

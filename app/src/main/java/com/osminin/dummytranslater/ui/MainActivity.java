@@ -6,6 +6,9 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -40,6 +43,7 @@ public class MainActivity extends BaseActivity implements MainView {
     public static final String TRANSLATION_MODEL_KEY = "translation_model_extra";
     private static final int INPUT_TIMEOUT = 300;
     private static final int REQUEST_TRANSLATION_ACTIVITY = 100;
+    private static final int REQUEST_FAVORITES_ACTIVITY = 200;
     private static final int ANIMATION_DURATION = 200;
 
     @Inject
@@ -62,6 +66,7 @@ public class MainActivity extends BaseActivity implements MainView {
     private ImageView mFavoriteStar;
 
     private PublishSubject<TranslationModel> mActivityResultSubject;
+    private PublishSubject<Integer> mOptionsSubject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +77,7 @@ public class MainActivity extends BaseActivity implements MainView {
         App.getAppComponent().inject(this);
         initList();
         mActivityResultSubject = PublishSubject.create();
+        mOptionsSubject = PublishSubject.create();
         mPresenter.bind(this);
     }
 
@@ -92,6 +98,19 @@ public class MainActivity extends BaseActivity implements MainView {
         super.onStop();
         mAdapter.clearRecent();
         mPresenter.stopObserveUiEvents();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        mOptionsSubject.onNext(item.getItemId());
+        return true;
     }
 
     @Override
@@ -148,6 +167,11 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
+    public Observable<Integer> optionsMenuObservable() {
+        return mOptionsSubject;
+    }
+
+    @Override
     public <T> Observable<T> changeTransDirection(T item) {
         int pos = mFromSpinner.getSelectedItemPosition();
         return Observable.just(item)
@@ -173,6 +197,12 @@ public class MainActivity extends BaseActivity implements MainView {
                     mInputField.setText("");
                     mAdapter.removeTranslationCard(mTranslationContainer);
                 });
+    }
+
+    @Override
+    public <T> Observable<T> showFavoritesView(T item) {
+        return Observable.just(item)
+                .doOnNext(this::launchFavoritesView);
     }
 
     @Override
@@ -238,6 +268,11 @@ public class MainActivity extends BaseActivity implements MainView {
                 makeSceneTransitionAnimation(this, mInputContainer, getString(R.string.main_translate_transition));
         intent.putExtra(TRANSLATION_MODEL_KEY, model);
         startActivityForResult(intent, REQUEST_TRANSLATION_ACTIVITY, options.toBundle());
+    }
+
+    private <T> void launchFavoritesView(T item) {
+        Intent intent = new Intent(this, FavoritesActivity.class);
+        startActivityForResult(intent, REQUEST_FAVORITES_ACTIVITY);
     }
 
     private void initList() {

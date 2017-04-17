@@ -3,9 +3,8 @@ package com.osminin.dummytranslater.db.modules;
 import android.content.Context;
 
 import com.osminin.dummytranslater.db.DbScope;
-import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
+import com.osminin.dummytranslater.db.TranslationDataStore;
 import com.osminin.dummytranslater.db.realm.RealmTranslationDataStore;
-import com.osminin.dummytranslater.models.TranslationModel;
 
 import dagger.Module;
 import dagger.Provides;

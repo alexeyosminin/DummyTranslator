@@ -2,7 +2,7 @@ package com.osminin.dummytranslater.db.realm;
 
 import android.content.Context;
 
-import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
+import com.osminin.dummytranslater.db.TranslationDataStore;
 import com.osminin.dummytranslater.models.TranslationModel;
 
 import io.reactivex.Observable;
@@ -57,6 +57,14 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
     @Override
     public Observable<TranslationModel> queryAll() {
         return Observable.fromIterable(mRealm.where(RealmRecentModel.class)
+                .findAllSorted(RealmRecentModel.getSortField(), DESCENDING))
+                .map(m -> m.fromDbModel());
+    }
+
+    @Override
+    public Observable<TranslationModel> queryFavorites() {
+        return Observable.fromIterable(mRealm.where(RealmRecentModel.class)
+                .equalTo(RealmRecentModel.getFavoriteField(), true)
                 .findAllSorted(RealmRecentModel.getSortField(), DESCENDING))
                 .map(m -> m.fromDbModel());
     }

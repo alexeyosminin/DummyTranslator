@@ -1,7 +1,8 @@
 package com.osminin.dummytranslater.presentation;
 
+import com.osminin.dummytranslater.R;
 import com.osminin.dummytranslater.application.App;
-import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
+import com.osminin.dummytranslater.db.TranslationDataStore;
 import com.osminin.dummytranslater.models.Languages;
 import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.presentation.interfaces.MainPresenter;
@@ -97,6 +98,9 @@ public final class MainPresenterImpl implements MainPresenter {
                 .switchMap(mView::clearRecentList)
                 .doOnNext(translationModel -> reloadRecents())
                 .subscribe());
+        mDisposable.add(mView.optionsMenuObservable()
+                .switchMap(this::handleOptionsMenuClick)
+                .subscribe());
     }
 
     @Override
@@ -136,5 +140,13 @@ public final class MainPresenterImpl implements MainPresenter {
                 .take(MAX_RECENTS_COUNT)
                 .switchMap(mView::addRecentItem)
                 .subscribe());
+    }
+
+    private Observable<Integer> handleOptionsMenuClick(Integer item) {
+        switch (item) {
+            case R.id.favorites:
+                return mView.showFavoritesView(item);
+        }
+        return Observable.empty();
     }
 }

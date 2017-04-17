@@ -29,11 +29,15 @@ public interface MainView extends BaseView {
 
     Observable<Object> favoriteStarObservable();
 
+    Observable<Integer> optionsMenuObservable();
+
     <T> Observable<T> changeTransDirection(T item);
 
     <T> Observable<T> clearRecentList(T item);
 
     <T> Observable<T> clearInputCard(T item);
+
+    <T> Observable<T> showFavoritesView(T item);
 
     Observable<Boolean> setFavorite(Boolean isFavorite);
 

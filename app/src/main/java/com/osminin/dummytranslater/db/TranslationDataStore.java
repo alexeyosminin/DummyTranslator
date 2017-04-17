@@ -1,4 +1,4 @@
-package com.osminin.dummytranslater.db.interfaces;
+package com.osminin.dummytranslater.db;
 
 import com.osminin.dummytranslater.models.TranslationModel;
 
@@ -22,4 +22,6 @@ public interface TranslationDataStore {
     Observable<TranslationModel> remove(TranslationModel item);
 
     Observable<TranslationModel> queryAll();
+
+    Observable<TranslationModel> queryFavorites();
 }

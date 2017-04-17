@@ -3,7 +3,7 @@ package com.osminin.dummytranslater.presentation;
 import android.view.KeyEvent;
 
 import com.osminin.dummytranslater.application.App;
-import com.osminin.dummytranslater.db.interfaces.TranslationDataStore;
+import com.osminin.dummytranslater.db.TranslationDataStore;
 import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.network.TranslatorService;
 import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;

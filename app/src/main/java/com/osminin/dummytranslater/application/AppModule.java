@@ -3,8 +3,10 @@ package com.osminin.dummytranslater.application;
 import android.app.Application;
 import android.content.Context;
 
+import com.osminin.dummytranslater.presentation.FavoritesPresenterImpl;
 import com.osminin.dummytranslater.presentation.MainPresenterImpl;
 import com.osminin.dummytranslater.presentation.TranslationPresenterImpl;
+import com.osminin.dummytranslater.presentation.interfaces.FavoritesPresenter;
 import com.osminin.dummytranslater.presentation.interfaces.MainPresenter;
 import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;
 
@@ -38,5 +40,10 @@ public final class AppModule {
     @Provides
     TranslationPresenter provideTranslationPresenter() {
         return new TranslationPresenterImpl();
+    }
+
+    @Provides
+    FavoritesPresenter provideFavoritesPresenter() {
+        return new FavoritesPresenterImpl();
     }
 }
