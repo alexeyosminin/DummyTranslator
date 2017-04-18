@@ -49,7 +49,5 @@ public interface MainView extends BaseView {
 
     Observable<TranslationModel> addRecentItem(TranslationModel model);
 
-    Observable<TranslationModel> updateRecentItem(TranslationModel model);
-
     Observable<TranslationModel> setDefaultTranslationDirection(TranslationModel model);
 }

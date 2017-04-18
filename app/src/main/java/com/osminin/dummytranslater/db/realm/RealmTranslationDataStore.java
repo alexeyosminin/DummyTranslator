@@ -8,6 +8,7 @@ import com.osminin.dummytranslater.models.TranslationModel;
 import io.reactivex.Observable;
 import io.realm.Realm;
 import io.realm.RealmResults;
+import timber.log.Timber;
 
 import static com.osminin.dummytranslater.Config.MAX_RECENTS_COUNT;
 import static io.realm.Sort.DESCENDING;
@@ -20,6 +21,7 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
     private Realm mRealm;
 
     public RealmTranslationDataStore(Context context) {
+        Timber.d("RealmTranslationDataStore: ");
         Realm.init(context);
     }
 
@@ -27,6 +29,7 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
     public <T> Observable<T> open(T item) {
         return Observable.fromCallable(() -> Realm.getDefaultInstance())
                 .doOnNext(realm -> mRealm = realm)
+                .doOnNext(realm -> Timber.d("open: "))
                 .switchMap(realm -> Observable.just(item));
     }
 
@@ -34,13 +37,15 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
     public <T> Observable<T> close(T item) {
         return Observable.just(item)
                 .doOnNext(this::trim)
-                .doOnNext(i -> mRealm.close());
+                .doOnNext(i -> mRealm.close())
+                .doOnNext(t -> Timber.d("close: "));
     }
 
     @Override
     public Observable<TranslationModel> add(TranslationModel item) {
         return Observable.just(item)
-                .doOnNext(this::addItem);
+                .doOnNext(this::addItem)
+                .doOnNext(model -> Timber.d("add: "));
     }
 
     @Override
@@ -58,6 +63,7 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
     public Observable<TranslationModel> queryAll() {
         return Observable.fromIterable(mRealm.where(RealmRecentModel.class)
                 .findAllSorted(RealmRecentModel.getSortField(), DESCENDING))
+                .doOnNext(m -> Timber.d("queryAll: "))
                 .map(m -> m.fromDbModel());
     }
 
@@ -66,10 +72,12 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
         return Observable.fromIterable(mRealm.where(RealmRecentModel.class)
                 .equalTo(RealmRecentModel.getFavoriteField(), true)
                 .findAllSorted(RealmRecentModel.getSortField(), DESCENDING))
+                .doOnNext(m -> Timber.d("queryFavorites: "))
                 .map(m -> m.fromDbModel());
     }
 
     private void addItem(TranslationModel item) {
+        Timber.d("addItem: ");
         mRealm.beginTransaction();
         RealmRecentModel model = RealmRecentModel.toDbModel(item);
         mRealm.copyToRealmOrUpdate(model);
@@ -77,6 +85,7 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
     }
 
     private <T> void trim(T item) {
+        Timber.d("trim: ");
         RealmResults<RealmRecentModel> models = mRealm
                 .where(RealmRecentModel.class)
                 .equalTo(RealmRecentModel.getFavoriteField(), false)

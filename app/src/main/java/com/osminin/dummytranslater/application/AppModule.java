@@ -12,6 +12,7 @@ import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;
 
 import dagger.Module;
 import dagger.Provides;
+import timber.log.Timber;
 
 /**
  * Created by osminin on 3/17/2017.
@@ -34,16 +35,19 @@ public final class AppModule {
 
     @Provides
     MainPresenter provideMainPresenter() {
+        Timber.d("provideMainPresenter: ");
         return new MainPresenterImpl();
     }
 
     @Provides
     TranslationPresenter provideTranslationPresenter() {
+        Timber.d("provideTranslationPresenter: ");
         return new TranslationPresenterImpl();
     }
 
     @Provides
     FavoritesPresenter provideFavoritesPresenter() {
+        Timber.d("provideFavoritesPresenter: ");
         return new FavoritesPresenterImpl();
     }
 }

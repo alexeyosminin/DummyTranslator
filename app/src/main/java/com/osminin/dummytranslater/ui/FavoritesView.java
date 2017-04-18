@@ -1,5 +1,6 @@
 package com.osminin.dummytranslater.ui;
 
+import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.ui.base.BaseView;
 
 /**
@@ -7,4 +8,7 @@ import com.osminin.dummytranslater.ui.base.BaseView;
  */
 
 public interface FavoritesView extends BaseView {
+    void addItem(TranslationModel model);
+
+    void clearList();
 }

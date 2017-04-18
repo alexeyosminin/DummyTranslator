@@ -14,6 +14,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 import static com.osminin.dummytranslater.Config.MAX_RECENTS_COUNT;
 
@@ -32,6 +33,7 @@ public final class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void bind(MainView view) {
+        Timber.d("bind: ");
         mView = view;
         mTranslationModel = new TranslationModel();
         App.plusDbComponent().inject(this);
@@ -39,6 +41,7 @@ public final class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void startObserveUiEvents() {
+        Timber.d("startObserveUiEvents: ");
         verifyDisposable();
         mDisposable.add(mView.textInputObservable()
                 .map(o -> mTranslationModel)
@@ -105,12 +108,14 @@ public final class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void stopObserveUiEvents() {
+        Timber.d("stopObserveUiEvents: ");
         if (!mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
     }
 
     private Observable<TranslationModel> loadRecent() {
+        Timber.d("loadRecent: ");
         return mDataStore.open(mDataStore)
                 .switchMap(dataStore -> dataStore.queryAll())
                 .doOnComplete(() -> mDisposable.add(mDataStore.close(mDataStore).subscribe()))
@@ -118,23 +123,27 @@ public final class MainPresenterImpl implements MainPresenter {
     }
 
     private void verifyDisposable() {
+        Timber.d("verifyDisposable: ");
         if (mDisposable == null || mDisposable.isDisposed()) {
             mDisposable = new CompositeDisposable();
         }
     }
 
     private <T> TranslationModel getDefaultModel() {
+        Timber.d("getDefaultModel: ");
         TranslationModel model = new TranslationModel();
         model.setTranslationDirection(Languages.ENGLISH, Languages.RUSSIAN);
         return model;
     }
 
     private void clearTranslationModel() {
+        Timber.d("clearTranslationModel: ");
         mTranslationModel.setPrimaryText(null);
         mTranslationModel.setTranslations(null);
     }
 
     private void reloadRecents() {
+        Timber.d("reloadRecents: ");
         mDisposable.add(loadRecent()
                 .subscribeOn(Schedulers.single())
                 .take(MAX_RECENTS_COUNT)
@@ -143,6 +152,7 @@ public final class MainPresenterImpl implements MainPresenter {
     }
 
     private Observable<Integer> handleOptionsMenuClick(Integer item) {
+        Timber.d("handleOptionsMenuClick: ");
         switch (item) {
             case R.id.favorites:
                 return mView.showFavoritesView(item);

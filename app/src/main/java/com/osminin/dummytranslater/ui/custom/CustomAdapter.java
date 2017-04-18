@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
+import timber.log.Timber;
 
 /**
  * Created by osminin on 3/20/2017.
@@ -40,6 +41,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int type) {
+        Timber.d("onCreateViewHolder: ");
         RecyclerView.ViewHolder res;
         View view;
         if (type == TYPE_RECENT) {
@@ -59,6 +61,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder vh, int position) {
+        Timber.d("onBindViewHolder: ");
         //check what type of view our position is
         if (position < mInput.size()) {
             View v = mInput.get(position);
@@ -86,6 +89,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     private void prepareHeaderFooter(HeaderFooterViewHolder vh, View view) {
+        Timber.d("prepareHeaderFooter: ");
         //empty out our FrameLayout and replace with our header/footer
         vh.base.removeAllViews();
         ViewGroup parent = (ViewGroup) view.getParent();
@@ -96,6 +100,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     private void prepareGeneric(RecentViewHolder vh, int position) {
+        Timber.d("prepareGeneric: ");
         TranslationModel recentItem = mRecents.get(position);
         RxView.clicks(vh.itemView)
                 .throttleFirst(CLICK_TIMEOUT, TimeUnit.MILLISECONDS)
@@ -105,6 +110,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public int getItemViewType(int position) {
+        Timber.d("getItemViewType: ");
         //check what type our position is, based on the assumption that the order is mInput > mRecents > mTranslation
         if (position < mInput.size()) {
             return TYPE_INPUT;
@@ -116,6 +122,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     //add a header to the adapter
     public void addInputCard(View header) {
+        Timber.d("addInputCard: ");
         if (!mInput.contains(header)) {
             mInput.add(header);
             //animate
@@ -125,6 +132,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     //remove a inputCard from the adapter
     public void removeInputCard(View inputCard) {
+        Timber.d("removeInputCard: ");
         if (mInput.contains(inputCard)) {
             //animate
             notifyItemRemoved(mInput.indexOf(inputCard));
@@ -137,6 +145,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     //add a translationCard to the adapter
     public void addTranslationCard(View translationCard) {
+        Timber.d("addTranslationCard: ");
         if (!mTranslation.contains(translationCard)) {
             mTranslation.add(translationCard);
             //animate
@@ -146,6 +155,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     //remove a translationCard from the adapter
     public void removeTranslationCard(View translationCard) {
+        Timber.d("removeTranslationCard: ");
         if (mTranslation.size() > 0) {
             //animate
             notifyItemRemoved(mInput.size());
@@ -157,17 +167,20 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void setRecents(List<TranslationModel> recents) {
+        Timber.d("setRecents: ");
         this.mRecents = recents;
         notifyDataSetChanged();
     }
 
     public void clearRecent() {
+        Timber.d("clearRecent: ");
         int count = mRecents.size();
         mRecents.clear();
         notifyItemRangeRemoved(mInput.size() + mTranslation.size() - 1, count);
     }
 
     public void addRecentItem(TranslationModel item) {
+        Timber.d("addRecentItem: ");
         mRecents.add(item);
         notifyItemChanged(mRecents.size() - 1);
     }

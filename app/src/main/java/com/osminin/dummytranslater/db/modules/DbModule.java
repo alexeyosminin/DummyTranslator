@@ -8,6 +8,7 @@ import com.osminin.dummytranslater.db.realm.RealmTranslationDataStore;
 
 import dagger.Module;
 import dagger.Provides;
+import timber.log.Timber;
 
 /**
  * Created by osminin on 3/21/2017.
@@ -19,6 +20,7 @@ public final class DbModule {
     @Provides
     @DbScope
     public TranslationDataStore provideDataStore(Context context) {
+        Timber.d("provideDataStore: ");
         return new RealmTranslationDataStore(context);
     }
 }

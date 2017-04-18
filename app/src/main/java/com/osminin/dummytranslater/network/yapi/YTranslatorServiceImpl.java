@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
+import timber.log.Timber;
 
 import static com.osminin.dummytranslater.Config.API_KEY;
 
@@ -25,11 +26,13 @@ public final class YTranslatorServiceImpl implements TranslatorService {
     private YTranslatorService mTranslatorService;
 
     public YTranslatorServiceImpl(Retrofit retrofit) {
+        Timber.d("YTranslatorServiceImpl: ");
         mTranslatorService = retrofit.create(YTranslatorService.class);
     }
 
     @Override
     public Observable<TranslationModel> translate(TranslationModel model) {
+        Timber.d("translate: ");
         String textDirection = model.getTranslationDirection().first.getCode()
                 .concat("-")
                 .concat(model.getTranslationDirection().second.getCode());

@@ -8,4 +8,7 @@ import com.osminin.dummytranslater.ui.FavoritesView;
  */
 
 public interface FavoritesPresenter extends BasePresenter<FavoritesView> {
+    void startObserveUiEvents();
+
+    void stopObserveUiEvents();
 }

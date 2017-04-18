@@ -14,6 +14,7 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import timber.log.Timber;
 
 import static com.osminin.dummytranslater.Config.HOST;
 
@@ -31,6 +32,7 @@ public final class NetworkModule {
     @NetworkScope
     @Named(YTranslatorService.class)
     Retrofit provideRetrofit() {
+        Timber.d("provideRetrofit: ");
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(REQUESTS_TIMEOUT, REQUESTS_TIMEOUT_UNITS)
                 .readTimeout(REQUESTS_TIMEOUT, REQUESTS_TIMEOUT_UNITS)
@@ -48,6 +50,7 @@ public final class NetworkModule {
     @Provides
     @NetworkScope
     TranslatorService provideTranslatorService(@Named(YTranslatorService.class) Retrofit retrofit) {
+        Timber.d("provideTranslatorService: ");
         TranslatorService service = new YTranslatorServiceImpl(retrofit);
         return service;
     }

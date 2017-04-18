@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  * TODO: Add a class header comment!
@@ -39,12 +40,14 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
 
     @Override
     public void bind(TranslationView view) {
+        Timber.d("bind: ");
         mView = view;
         App.plusNetworkComponent().inject(this);
     }
 
     @Override
     public void startObserveUiChanges() {
+        Timber.d("startObserveUiChanges: ");
         verifyDisposable();
         //start observe text input
         mDisposable.add(mView.inputTextChanges()
@@ -88,6 +91,7 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
 
     @Override
     public void stopObserveUiChanges() {
+        Timber.d("stopObserveUiChanges: ");
         if (!mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
@@ -95,21 +99,25 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
 
     @Override
     public void setTranslationModel(TranslationModel model) {
+        Timber.d("setTranslationModel: ");
         mModel = model;
     }
 
     @Override
     public void destroy() {
+        Timber.d("destroy: ");
         App.clearNetworkComponent();
     }
 
     private void verifyDisposable() {
+        Timber.d("verifyDisposable: ");
         if (mDisposable == null || mDisposable.isDisposed()) {
             mDisposable = new CompositeDisposable();
         }
     }
 
     private void updateModel(String primaryText, List<String> translations) {
+        Timber.d("updateModel: ");
         if (mModel != null) {
             mModel.setPrimaryText(primaryText);
             mModel.setTranslations(translations);
@@ -117,6 +125,7 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     }
 
     private void handleError(Throwable t) {
+        Timber.d("handleError: ");
         //restart subscription
         if (t instanceof java.io.InterruptedIOException ||
                 t instanceof java.net.SocketTimeoutException) {
