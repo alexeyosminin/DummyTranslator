@@ -50,6 +50,12 @@ public final class FavoritesPresenterImpl implements FavoritesPresenter {
         }
     }
 
+    @Override
+    public void destroy() {
+        Timber.d("destroy: ");
+        App.clearDbComponent();
+    }
+
     private void verifyDisposable() {
         Timber.d("verifyDisposable: ");
         if (mDisposable == null || mDisposable.isDisposed()) {

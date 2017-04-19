@@ -7,11 +7,13 @@ import android.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 /**
  * Created by osminin on 3/21/2017.
  */
 
-public class TranslationModel implements Parcelable {
+public class TranslationModel implements Parcelable, Cloneable {
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<TranslationModel> CREATOR = new Parcelable.Creator<TranslationModel>() {
         @Override
@@ -31,22 +33,8 @@ public class TranslationModel implements Parcelable {
     private Pair<Languages, Languages> mTranslationDirection;
     private long mTimestamp;
 
-    public TranslationModel(String primaryText, String secondaryText, List<String> translations, boolean isFavorite) {
-        mPrimaryText = primaryText;
-        mSecondaryText = secondaryText;
-        mTranslations = translations;
-        this.isFavorite = isFavorite;
-        mTimestamp = System.currentTimeMillis();
-    }
-
     public TranslationModel() {
         mTimestamp = System.currentTimeMillis();
-    }
-
-    public TranslationModel(String primaryText, String secondaryText, boolean isFavorite) {
-        mPrimaryText = primaryText;
-        mSecondaryText = secondaryText;
-        this.isFavorite = isFavorite;
     }
 
     public TranslationModel(String primaryText, String secondaryText, List<String> translations,
@@ -58,9 +46,11 @@ public class TranslationModel implements Parcelable {
         setTranslationFrom(Languages.values()[from]);
         setTranslationTo(Languages.values()[to]);
         mTimestamp = timestamp;
+        Timber.d("TranslationModel: %s", this);
     }
 
     protected TranslationModel(Parcel in) {
+        Timber.d("TranslationModel: ");
         mPrimaryText = in.readString();
         mSecondaryText = in.readString();
         if (in.readByte() == 0x01) {
@@ -81,18 +71,22 @@ public class TranslationModel implements Parcelable {
     }
 
     public Pair<Languages, Languages> getTranslationDirection() {
+        Timber.d("getTranslationDirection: ");
         return mTranslationDirection;
     }
 
     public void setTranslationDirection(Languages from, Languages to) {
+        Timber.d("setTranslationDirection: ");
         mTranslationDirection = new Pair<>(from, to);
     }
 
     public void setTranslationDirection(Pair<Languages, Languages> direction) {
+        Timber.d("setTranslationDirection: ");
         mTranslationDirection = direction;
     }
 
     public void setTranslationFrom(Languages from) {
+        Timber.d("setTranslationFrom: %s", from.name());
         if (mTranslationDirection == null) {
             mTranslationDirection = new Pair<>(from, null);
         } else {
@@ -101,6 +95,7 @@ public class TranslationModel implements Parcelable {
     }
 
     public void setTranslationTo(Languages to) {
+        Timber.d("setTranslationTo: %s", to.name());
         if (mTranslationDirection == null) {
             mTranslationDirection = new Pair<>(null, to);
         } else {
@@ -155,6 +150,7 @@ public class TranslationModel implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        Timber.d("writeToParcel: ");
         dest.writeString(mPrimaryText);
         dest.writeString(mSecondaryText);
         if (mTranslations == null) {
@@ -191,5 +187,27 @@ public class TranslationModel implements Parcelable {
         int result = mPrimaryText.hashCode();
         result = 31 * result + mTranslationDirection.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return mPrimaryText;
+    }
+
+    @Override
+    public TranslationModel clone() throws CloneNotSupportedException {
+        //deep copy here
+        TranslationModel clone = new TranslationModel();
+        clone.mPrimaryText = mPrimaryText;
+        clone.mSecondaryText = mSecondaryText;
+        clone.isFavorite = isFavorite;
+        clone.setTranslationDirection(mTranslationDirection.first, mTranslationDirection.second);
+        clone.mTimestamp = mTimestamp;
+        ArrayList<String> translations = new ArrayList<>();
+        for (String str : mTranslations) {
+            translations.add(str);
+        }
+        clone.setTranslations(translations);
+        return clone;
     }
 }

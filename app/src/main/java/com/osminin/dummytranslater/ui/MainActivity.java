@@ -247,8 +247,9 @@ public class MainActivity extends BaseActivity implements MainView {
 
     @Override
     public Observable<TranslationModel> setTranslation(TranslationModel model) {
-        Timber.d("setTranslation: ");
+        Timber.d("setTranslation: %s", model);
         return Observable.just(model)
+                //.filter(model1 -> !model.getTranslations().isEmpty())
                 .doOnNext(this::addTranslationCard)
                 .doOnNext(m -> mTranslationField.setText(m.getTranslations().get(0)))
                 .doOnNext(m -> mFavoriteStar.setImageResource(
@@ -259,7 +260,7 @@ public class MainActivity extends BaseActivity implements MainView {
 
     @Override
     public Observable<TranslationModel> addRecentItem(TranslationModel model) {
-        Timber.d("addRecentItem: ");
+        Timber.d("addRecentItem: %s", model);
         return Observable.just(model)
                 .doOnNext(mAdapter::addRecentItem);
     }

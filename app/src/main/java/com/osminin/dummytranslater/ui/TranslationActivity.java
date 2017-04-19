@@ -12,6 +12,7 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.osminin.dummytranslater.R;
 import com.osminin.dummytranslater.application.App;
+import com.osminin.dummytranslater.models.Languages;
 import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.presentation.interfaces.TranslationPresenter;
 import com.osminin.dummytranslater.ui.base.BaseActivity;
@@ -147,6 +148,16 @@ public final class TranslationActivity extends BaseActivity implements Translati
     public Observable<Object> backButtonClicks() {
         Timber.d("backButtonClicks: ");
         return mBackButtonSubject;
+    }
+
+    @Override
+    public void setTranslationHintFrom(Languages language) {
+        mTranslationInput.setHint(language.getHRres());
+    }
+
+    @Override
+    public void setTranslationHintTo(Languages language) {
+        mTranslationResult.setHint(language.getHRres());
     }
 
     @Override

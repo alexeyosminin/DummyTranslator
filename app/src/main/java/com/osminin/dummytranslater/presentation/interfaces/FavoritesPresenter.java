@@ -11,4 +11,6 @@ public interface FavoritesPresenter extends BasePresenter<FavoritesView> {
     void startObserveUiEvents();
 
     void stopObserveUiEvents();
+
+    void destroy();
 }

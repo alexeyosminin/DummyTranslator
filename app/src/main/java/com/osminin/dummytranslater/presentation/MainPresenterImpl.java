@@ -60,7 +60,7 @@ public final class MainPresenterImpl implements MainPresenter {
                 .subscribe(l -> mTranslationModel.setTranslationTo(l)));
 
         mDisposable.add(mView.activityResultObservable()
-                .doOnNext(model -> mTranslationModel = model)
+                .doOnNext(model -> mTranslationModel = model.clone())
                 .switchMap(mView::setPrimaryText)
                 .filter(m -> m.getTranslations() != null
                         && !m.getTranslations().isEmpty())
@@ -80,7 +80,7 @@ public final class MainPresenterImpl implements MainPresenter {
                 .subscribe());
         mDisposable.add(mView.recentItemsObservable()
                 .doOnNext(model -> {
-                    mTranslationModel = model;
+                    mTranslationModel = model.clone();
                 })
                 .switchMap(mView::setDefaultTranslationDirection)
                 .switchMap(mView::setPrimaryText)
@@ -137,7 +137,7 @@ public final class MainPresenterImpl implements MainPresenter {
     }
 
     private void clearTranslationModel() {
-        Timber.d("clearTranslationModel: ");
+        Timber.d("clearTranslationModel: %s", mTranslationModel);
         mTranslationModel.setPrimaryText(null);
         mTranslationModel.setTranslations(null);
     }

@@ -101,6 +101,8 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     public void setTranslationModel(TranslationModel model) {
         Timber.d("setTranslationModel: ");
         mModel = model;
+        mView.setTranslationHintFrom(mModel.getTranslationDirection().first);
+        mView.setTranslationHintTo(mModel.getTranslationDirection().second);
     }
 
     @Override

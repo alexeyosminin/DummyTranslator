@@ -41,7 +41,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int type) {
-        Timber.d("onCreateViewHolder: ");
+        Timber.v("onCreateViewHolder: ");
         RecyclerView.ViewHolder res;
         View view;
         if (type == TYPE_RECENT) {
@@ -61,7 +61,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder vh, int position) {
-        Timber.d("onBindViewHolder: ");
+        Timber.v("onBindViewHolder: %d", position);
         //check what type of view our position is
         if (position < mInput.size()) {
             View v = mInput.get(position);
@@ -89,7 +89,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     private void prepareHeaderFooter(HeaderFooterViewHolder vh, View view) {
-        Timber.d("prepareHeaderFooter: ");
+        Timber.v("prepareHeaderFooter: ");
         //empty out our FrameLayout and replace with our header/footer
         vh.base.removeAllViews();
         ViewGroup parent = (ViewGroup) view.getParent();
@@ -100,17 +100,16 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     private void prepareGeneric(RecentViewHolder vh, int position) {
-        Timber.d("prepareGeneric: ");
-        TranslationModel recentItem = mRecents.get(position);
+        Timber.v("prepareGeneric: %d", position);
         RxView.clicks(vh.itemView)
                 .throttleFirst(CLICK_TIMEOUT, TimeUnit.MILLISECONDS)
-                .map(aVoid -> recentItem)
+                .map(aVoid -> mRecents.get(position))
                 .subscribe(mViewClickSubject);
     }
 
     @Override
     public int getItemViewType(int position) {
-        Timber.d("getItemViewType: ");
+        Timber.v("getItemViewType: %d", position);
         //check what type our position is, based on the assumption that the order is mInput > mRecents > mTranslation
         if (position < mInput.size()) {
             return TYPE_INPUT;
@@ -180,7 +179,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void addRecentItem(TranslationModel item) {
-        Timber.d("addRecentItem: ");
+        Timber.d("addRecentItem: %s", item);
         mRecents.add(item);
         notifyItemChanged(mRecents.size() - 1);
     }
