@@ -40,6 +40,12 @@ public final class MainPresenterImpl implements MainPresenter {
     }
 
     @Override
+    public void destroy() {
+        Timber.d("destroy: ");
+        App.clearDbComponent();
+    }
+
+    @Override
     public void startObserveUiEvents() {
         Timber.d("startObserveUiEvents: ");
         verifyDisposable();
@@ -60,10 +66,10 @@ public final class MainPresenterImpl implements MainPresenter {
                 .subscribe(l -> mTranslationModel.setTranslationTo(l)));
 
         mDisposable.add(mView.activityResultObservable()
-                .doOnNext(model -> mTranslationModel = model.clone())
-                .switchMap(mView::setPrimaryText)
                 .filter(m -> m.getTranslations() != null
                         && !m.getTranslations().isEmpty())
+                .doOnNext(model -> mTranslationModel = model.clone())
+                .switchMap(mView::setPrimaryText)
                 .switchMap(mView::setTranslation)
                 .doOnError(m -> mView.showError())
                 .subscribe());

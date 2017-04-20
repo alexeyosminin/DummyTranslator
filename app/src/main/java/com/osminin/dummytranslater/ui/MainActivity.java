@@ -43,6 +43,7 @@ public class MainActivity extends BaseActivity implements MainView {
     public static final String TRANSLATION_MODEL_KEY = "translation_model_extra";
     private static final int INPUT_TIMEOUT = 300;
     private static final int REQUEST_TRANSLATION_ACTIVITY = 100;
+    private static final int REQUEST_FAVORITES_ACTIVITY = 200;
     private static final int ANIMATION_DURATION = 200;
 
     @Inject
@@ -86,6 +87,7 @@ public class MainActivity extends BaseActivity implements MainView {
         super.onDestroy();
         Timber.d("onDestroy: ");
         mActivityResultSubject.onComplete();
+        mPresenter.destroy();
     }
 
     @Override
@@ -293,7 +295,7 @@ public class MainActivity extends BaseActivity implements MainView {
     private <T> void launchFavoritesView(T item) {
         Timber.d("launchFavoritesView: ");
         Intent intent = new Intent(this, FavoritesActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_FAVORITES_ACTIVITY);
     }
 
     private void initList() {

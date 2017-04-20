@@ -18,6 +18,7 @@ public final class App extends Application {
     private static AppComponent appComponent;
     private static NetworkComponent networkComponent;
     private static DbComponent dbComponent;
+    private static int dbComponentUsers;
 
     public static AppComponent getAppComponent() {
         return appComponent;
@@ -43,12 +44,16 @@ public final class App extends Application {
         if (dbComponent == null) {
             dbComponent = appComponent.plusDbComponent(new DbModule());
         }
+        ++dbComponentUsers;
         return dbComponent;
     }
 
     public static void clearDbComponent() {
         Timber.d("clearDbComponent: ");
-        dbComponent = null;
+        if (dbComponentUsers == 1) {
+            dbComponent = null;
+        }
+        --dbComponentUsers;
     }
 
     @Override

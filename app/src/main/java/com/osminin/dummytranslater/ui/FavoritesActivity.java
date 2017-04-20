@@ -66,6 +66,12 @@ public final class FavoritesActivity extends BaseActivity implements FavoritesVi
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPresenter.destroy();
+    }
+
+    @Override
     public void addItem(TranslationModel model) {
         Timber.d("addItem: ");
         mAdapter.addItem(model);

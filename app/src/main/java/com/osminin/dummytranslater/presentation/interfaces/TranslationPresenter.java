@@ -14,6 +14,4 @@ public interface TranslationPresenter extends BasePresenter<TranslationView> {
     void stopObserveUiChanges();
 
     void setTranslationModel(TranslationModel model);
-
-    void destroy();
 }
