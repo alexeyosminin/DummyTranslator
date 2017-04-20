@@ -50,6 +50,7 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
 
     @Override
     public Observable<TranslationModel> update(TranslationModel item) {
+        //TODO: rework (it replaces existing entries with loss of data)
         return add(item);
     }
 

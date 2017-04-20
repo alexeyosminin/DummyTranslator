@@ -91,7 +91,6 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
                 .map(CharSequence::toString)
                 .flatMap(mView::showProgress)
                 .doOnNext(string -> updateModel(string, null))
-                .observeOn(Schedulers.io())
                 .switchMap(string -> mTranslatorService.translate(mModel))
                 .switchMap(mView::onTextTranslated)
                 .flatMap(mView::hideProgress)

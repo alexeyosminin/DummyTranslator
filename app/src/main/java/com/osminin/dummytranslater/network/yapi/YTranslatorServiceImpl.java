@@ -41,6 +41,7 @@ public final class YTranslatorServiceImpl implements TranslatorService {
                 .map(responseModel -> responseModel.fromNetworkModel())
                 .doOnNext(m -> m.setPrimaryText(model.getPrimaryText()))
                 .doOnNext(m -> m.setTranslationDirection(model.getTranslationDirection()))
-                .unsubscribeOn(Schedulers.io());
+                .unsubscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io());
     }
 }
