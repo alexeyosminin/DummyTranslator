@@ -23,7 +23,8 @@ import timber.log.Timber;
  * TODO: Add a class header comment!
  */
 
-public final class TranslationPresenterImpl implements TranslationPresenter {
+public final class TranslationPresenterImpl extends BasePresenterImpl<TranslationView>
+        implements TranslationPresenter {
 
     private static final int INPUT_TIMEOUT = 300;
     private static final int INPUT_MIN = 1;
@@ -34,14 +35,11 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     @Inject
     TranslationDataStore mDataStore;
 
-    private TranslationView mView;
-    private CompositeDisposable mDisposable;
     private TranslationModel mModel;
 
     @Override
     public void bind(TranslationView view) {
-        Timber.d("bind: ");
-        mView = view;
+        super.bind(view);
         App.plusNetworkComponent().inject(this);
     }
 
@@ -109,13 +107,6 @@ public final class TranslationPresenterImpl implements TranslationPresenter {
     public void destroy() {
         Timber.d("destroy: ");
         App.clearNetworkComponent();
-    }
-
-    private void verifyDisposable() {
-        Timber.d("verifyDisposable: ");
-        if (mDisposable == null || mDisposable.isDisposed()) {
-            mDisposable = new CompositeDisposable();
-        }
     }
 
     private void updateModel(String primaryText, List<String> translations) {

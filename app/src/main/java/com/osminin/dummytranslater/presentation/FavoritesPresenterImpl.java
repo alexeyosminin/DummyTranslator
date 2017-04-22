@@ -15,17 +15,14 @@ import timber.log.Timber;
  * Created by osminin on 4/17/2017.
  */
 
-public final class FavoritesPresenterImpl implements FavoritesPresenter {
+public final class FavoritesPresenterImpl extends BasePresenterImpl<FavoritesView> implements FavoritesPresenter {
 
     @Inject
     TranslationDataStore mDataStore;
-    private FavoritesView mView;
-    private CompositeDisposable mDisposable;
 
     @Override
     public void bind(FavoritesView view) {
-        Timber.d("bind: ");
-        mView = view;
+        super.bind(view);
         App.plusDbComponent().inject(this);
     }
 
@@ -54,12 +51,5 @@ public final class FavoritesPresenterImpl implements FavoritesPresenter {
     public void destroy() {
         Timber.d("destroy: ");
         App.clearDbComponent();
-    }
-
-    private void verifyDisposable() {
-        Timber.d("verifyDisposable: ");
-        if (mDisposable == null || mDisposable.isDisposed()) {
-            mDisposable = new CompositeDisposable();
-        }
     }
 }

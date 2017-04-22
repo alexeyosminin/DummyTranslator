@@ -12,7 +12,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -22,19 +21,16 @@ import static com.osminin.dummytranslater.Config.MAX_RECENTS_COUNT;
  * TODO: Add a class header comment!
  */
 
-public final class MainPresenterImpl implements MainPresenter {
+public final class MainPresenterImpl extends BasePresenterImpl<MainView> implements MainPresenter {
 
     @Inject
     TranslationDataStore mDataStore;
 
-    private MainView mView;
     private TranslationModel mTranslationModel;
-    private CompositeDisposable mDisposable;
 
     @Override
     public void bind(MainView view) {
-        Timber.d("bind: ");
-        mView = view;
+        super.bind(view);
         mTranslationModel = new TranslationModel();
         App.plusDbComponent().inject(this);
     }
@@ -120,13 +116,6 @@ public final class MainPresenterImpl implements MainPresenter {
                 .switchMap(dataStore -> dataStore.queryAll())
                 .doOnComplete(() -> mDisposable.add(mDataStore.close(mDataStore).subscribe()))
                 .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    private void verifyDisposable() {
-        Timber.d("verifyDisposable: ");
-        if (mDisposable == null || mDisposable.isDisposed()) {
-            mDisposable = new CompositeDisposable();
-        }
     }
 
     private <T> TranslationModel getDefaultModel() {
