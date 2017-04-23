@@ -1,5 +1,6 @@
 package com.osminin.dummytranslater.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding2.view.RxView;
 import com.osminin.dummytranslater.R;
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.models.TranslationModel;
@@ -16,12 +18,17 @@ import com.osminin.dummytranslater.ui.base.BaseActivity;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 import timber.log.Timber;
+
+import static com.osminin.dummytranslater.Config.TRANSLATION_MODEL_KEY;
 
 /**
  * Created by osminin on 4/17/2017.
@@ -66,9 +73,28 @@ public final class FavoritesActivity extends BaseActivity implements FavoritesVi
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPresenter.destroy();
+    }
+
+    @Override
     public void addItem(TranslationModel model) {
         Timber.d("addItem: ");
         mAdapter.addItem(model);
+    }
+
+    @Override
+    public Observable<TranslationModel> itemClickObservable() {
+        Timber.d("itemClickObservable: ");
+        return mAdapter.mViewClickSubject.cast(TranslationModel.class);
+    }
+
+    @Override
+    public void finishView(TranslationModel model) {
+        Timber.d("finishView: ");
+        setResult(RESULT_OK, new Intent().putExtra(TRANSLATION_MODEL_KEY, model));
+        supportFinishAfterTransition();
     }
 
     @Override
@@ -78,7 +104,9 @@ public final class FavoritesActivity extends BaseActivity implements FavoritesVi
     }
 
     class FavoritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        List<TranslationModel> mData = new LinkedList<>();
+        private static final int CLICK_TIMEOUT = 500;
+        private List<TranslationModel> mData = new LinkedList<>();
+        PublishSubject<TranslationModel> mViewClickSubject = PublishSubject.create();
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -89,6 +117,10 @@ public final class FavoritesActivity extends BaseActivity implements FavoritesVi
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             ((FavoritesViewHolder) holder).mPrimaryText.setText(mData.get(position).getPrimaryText());
+            RxView.clicks(holder.itemView)
+                    .throttleFirst(CLICK_TIMEOUT, TimeUnit.MILLISECONDS)
+                    .map(aVoid -> mData.get(position))
+                    .subscribe(mViewClickSubject);
         }
 
         @Override

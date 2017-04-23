@@ -35,14 +35,15 @@ import io.reactivex.subjects.PublishSubject;
 import oxim.digital.rx2anim.RxAnimations;
 import timber.log.Timber;
 
+import static com.osminin.dummytranslater.Config.TRANSLATION_MODEL_KEY;
 import static oxim.digital.rx2anim.RxAnimations.animateTogether;
 import static oxim.digital.rx2anim.RxAnimations.fadeIn;
 import static oxim.digital.rx2anim.RxAnimations.fadeOut;
 
 public class MainActivity extends BaseActivity implements MainView {
-    public static final String TRANSLATION_MODEL_KEY = "translation_model_extra";
     private static final int INPUT_TIMEOUT = 300;
     private static final int REQUEST_TRANSLATION_ACTIVITY = 100;
+    private static final int REQUEST_FAVORITES_ACTIVITY = 200;
     private static final int ANIMATION_DURATION = 200;
 
     @Inject
@@ -86,6 +87,7 @@ public class MainActivity extends BaseActivity implements MainView {
         super.onDestroy();
         Timber.d("onDestroy: ");
         mActivityResultSubject.onComplete();
+        mPresenter.destroy();
     }
 
     @Override
@@ -222,6 +224,12 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
+    public <T> Observable<T> requestInputFocus(T item) {
+        return Observable.just(item)
+                .doOnNext(t -> mInputField.requestFocus());
+    }
+
+    @Override
     public Observable<Boolean> setFavorite(Boolean isFavorite) {
         Timber.d("setFavorite: ");
         return Observable.just(isFavorite)
@@ -266,6 +274,13 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
+    public Observable<TranslationModel> updateRecentItem(TranslationModel item) {
+        Timber.d("updateRecentItem: %s", item);
+        return Observable.just(item)
+                .doOnNext(mAdapter::updateRecentItem);
+    }
+
+    @Override
     public Observable<TranslationModel> setDefaultTranslationDirection(TranslationModel model) {
         Timber.d("setDefaultTranslationDirection: ");
         return Observable.just(model)
@@ -275,7 +290,9 @@ public class MainActivity extends BaseActivity implements MainView {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Timber.d("onActivityResult: ");
-        if (requestCode == REQUEST_TRANSLATION_ACTIVITY && resultCode == RESULT_OK) {
+        if ((requestCode == REQUEST_TRANSLATION_ACTIVITY
+                    || requestCode == REQUEST_FAVORITES_ACTIVITY)
+                && resultCode == RESULT_OK) {
             TranslationModel model = data.getParcelableExtra(TRANSLATION_MODEL_KEY);
             mActivityResultSubject.onNext(model);
         }
@@ -285,7 +302,7 @@ public class MainActivity extends BaseActivity implements MainView {
         Timber.d("launchTranslationView: ");
         Intent intent = new Intent(this, TranslationActivity.class);
         ActivityOptionsCompat options = ActivityOptionsCompat.
-                makeSceneTransitionAnimation(this, mInputContainer, getString(R.string.main_translate_transition));
+                makeSceneTransitionAnimation(this, mInputContainer, mInputContainer.getTransitionName());
         intent.putExtra(TRANSLATION_MODEL_KEY, model);
         startActivityForResult(intent, REQUEST_TRANSLATION_ACTIVITY, options.toBundle());
     }
@@ -293,7 +310,8 @@ public class MainActivity extends BaseActivity implements MainView {
     private <T> void launchFavoritesView(T item) {
         Timber.d("launchFavoritesView: ");
         Intent intent = new Intent(this, FavoritesActivity.class);
-        startActivity(intent);
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeBasic();
+        startActivityForResult(intent, REQUEST_FAVORITES_ACTIVITY, options.toBundle());
     }
 
     private void initList() {

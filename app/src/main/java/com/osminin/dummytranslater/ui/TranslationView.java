@@ -27,6 +27,8 @@ public interface TranslationView extends BaseView{
     Observable<TranslationModel> onTextTranslated(TranslationModel item);
     Observable<TranslationModel> onTextInputStop(TranslationModel item);
     <T> Observable<T> showProgress(T item);
+    <T> Observable<T> hideProgress(T item);
+    <T> Observable<T> hideKeyboard(T item);
     <T> Observable<T> showCrossButton(T item);
     <T> Observable<T> clearInputOutputFields(T item);
 }

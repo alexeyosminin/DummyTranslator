@@ -21,8 +21,8 @@ public abstract class BasePresenterImpl<T extends BaseView> implements BasePrese
         mView = view;
     }
 
-    protected void verifyDisposable() {
-        Timber.d("verifyDisposable: ");
+    protected void prepareDisposable() {
+        Timber.d("prepareDisposable: ");
         if (mDisposable == null || mDisposable.isDisposed()) {
             mDisposable = new CompositeDisposable();
         }

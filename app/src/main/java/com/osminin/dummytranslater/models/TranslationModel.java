@@ -2,6 +2,7 @@ package com.osminin.dummytranslater.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.Pair;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import timber.log.Timber;
  * Created by osminin on 3/21/2017.
  */
 
-public class TranslationModel implements Parcelable, Cloneable {
+public class TranslationModel implements Parcelable, Cloneable, Comparable<TranslationModel> {
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<TranslationModel> CREATOR = new Parcelable.Creator<TranslationModel>() {
         @Override
@@ -204,10 +205,13 @@ public class TranslationModel implements Parcelable, Cloneable {
         clone.setTranslationDirection(mTranslationDirection.first, mTranslationDirection.second);
         clone.mTimestamp = mTimestamp;
         ArrayList<String> translations = new ArrayList<>();
-        for (String str : mTranslations) {
-            translations.add(str);
-        }
+        translations.addAll(mTranslations);
         clone.setTranslations(translations);
         return clone;
+    }
+
+    @Override
+    public int compareTo(@NonNull TranslationModel o) {
+        return Long.compare(o.getTimestamp(), mTimestamp);
     }
 }

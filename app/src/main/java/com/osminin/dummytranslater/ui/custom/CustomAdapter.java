@@ -12,6 +12,7 @@ import com.osminin.dummytranslater.R;
 import com.osminin.dummytranslater.models.TranslationModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -34,10 +35,6 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private List<View> mTranslation = new ArrayList<>();
 
     private PublishSubject<TranslationModel> mViewClickSubject = PublishSubject.create();
-
-    public Observable<TranslationModel> getViewClickedObservable() {
-        return mViewClickSubject;
-    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int type) {
@@ -119,6 +116,10 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return TYPE_TRANSLATION;
     }
 
+    public Observable<TranslationModel> getViewClickedObservable() {
+        return mViewClickSubject.cast(TranslationModel.class);
+    }
+
     //add a header to the adapter
     public void addInputCard(View header) {
         Timber.d("addInputCard: ");
@@ -181,7 +182,14 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void addRecentItem(TranslationModel item) {
         Timber.d("addRecentItem: %s", item);
         mRecents.add(item);
-        notifyItemChanged(mRecents.size() - 1);
+        notifyItemChanged(mRecents.size() + mInput.size() + mTranslation.size() - 1);
+    }
+
+    public void updateRecentItem(TranslationModel item) {
+        Timber.d("updateRecentItem: %s", item);
+        int pos = Collections.binarySearch(mRecents, item);
+        mRecents.set(pos, item);
+        notifyItemChanged(pos + mInput.size() + mTranslation.size());
     }
 
     public static class RecentViewHolder extends RecyclerView.ViewHolder {

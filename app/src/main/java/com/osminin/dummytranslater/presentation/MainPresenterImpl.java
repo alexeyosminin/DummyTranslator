@@ -36,15 +36,58 @@ public final class MainPresenterImpl extends BasePresenterImpl<MainView> impleme
     }
 
     @Override
+    public void destroy() {
+        Timber.d("destroy: ");
+        App.clearDbComponent();
+    }
+
+    @Override
     public void startObserveUiEvents() {
         Timber.d("startObserveUiEvents: ");
-        verifyDisposable();
+        prepareDisposable();
+        //start listen text input
+        addTextInputObservable();
+        //start listen translation direction changes
+        addTranslationDirectionObservables();
+        //start listen activity result callback
+        addActivityResultObservable();
+        // load recent items
+        mDisposable.add(loadRecent()
+                .subscribeOn(Schedulers.single())
+                .first(getDefaultModel())
+                .toObservable()
+                .switchMap(mView::setDefaultTranslationDirection)
+                .doOnComplete(() -> reloadRecents())
+                .subscribe());
+        //start observe clear input btn
+        addClearInputObservable();
+        // start observe recent item clicks
+        addRecentClicksObservable();
+        // listen for favorite clicks
+        addFavoriteClickObservable();
+        // start observe options menu clicks
+        addOptionsMenuObservable();
+    }
+
+    @Override
+    public void stopObserveUiEvents() {
+        Timber.d("stopObserveUiEvents: ");
+        if (!mDisposable.isDisposed()) {
+            mDisposable.dispose();
+        }
+    }
+
+    private void addTextInputObservable() {
+        Timber.v("addTextInputObservable: ");
         mDisposable.add(mView.textInputObservable()
                 .map(o -> mTranslationModel)
                 .switchMap(mView::showTranslationView)
                 .switchMap(mView::clearRecentList)
                 .subscribe());
+    }
 
+    private void addTranslationDirectionObservables() {
+        Timber.v("addTranslationDirectionObservables: ");
         mDisposable.add(mView.translationDirectionObservable()
                 .switchMap(mView::changeTransDirection)
                 .subscribe());
@@ -54,26 +97,30 @@ public final class MainPresenterImpl extends BasePresenterImpl<MainView> impleme
 
         mDisposable.add(mView.toSpinnerObservable()
                 .subscribe(l -> mTranslationModel.setTranslationTo(l)));
+    }
 
+    private void addActivityResultObservable() {
+        Timber.v("addActivityResultObservable: ");
         mDisposable.add(mView.activityResultObservable()
-                .doOnNext(model -> mTranslationModel = model.clone())
-                .switchMap(mView::setPrimaryText)
+                .switchMap(mView::requestInputFocus)
                 .filter(m -> m.getTranslations() != null
                         && !m.getTranslations().isEmpty())
+                .doOnNext(model -> mTranslationModel = model.clone())
+                .switchMap(mView::setPrimaryText)
                 .switchMap(mView::setTranslation)
-                .doOnError(m -> mView.showError())
                 .subscribe());
-        mDisposable.add(loadRecent()
-                .subscribeOn(Schedulers.single())
-                .first(getDefaultModel())
-                .toObservable()
-                .switchMap(mView::setDefaultTranslationDirection)
-                .doOnComplete(() -> reloadRecents())
-                .subscribe());
+    }
+
+    private void addClearInputObservable() {
+        Timber.v("addClearInputObservable: ");
         mDisposable.add(mView.clearInputObservable()
                 .switchMap(mView::clearInputCard)
                 .doOnNext(o -> clearTranslationModel())
                 .subscribe());
+    }
+
+    private void addRecentClicksObservable() {
+        Timber.v("addRecentClicksObservable: ");
         mDisposable.add(mView.recentItemsObservable()
                 .doOnNext(model -> {
                     mTranslationModel = model.clone();
@@ -82,6 +129,10 @@ public final class MainPresenterImpl extends BasePresenterImpl<MainView> impleme
                 .switchMap(mView::setPrimaryText)
                 .switchMap(mView::setTranslation)
                 .subscribe());
+    }
+
+    private void addFavoriteClickObservable() {
+        Timber.v("addFavoriteClickObservable: ");
         mDisposable.add(mView.favoriteStarObservable()
                 .map(o -> !mTranslationModel.isFavorite())
                 .doOnNext(isFav -> {
@@ -94,20 +145,15 @@ public final class MainPresenterImpl extends BasePresenterImpl<MainView> impleme
                 .switchMap(mDataStore::update)
                 .switchMap(mDataStore::close)
                 .observeOn(AndroidSchedulers.mainThread())
-                .switchMap(mView::clearRecentList)
-                .doOnNext(translationModel -> reloadRecents())
-                .subscribe());
-        mDisposable.add(mView.optionsMenuObservable()
-                .switchMap(this::handleOptionsMenuClick)
+                .switchMap(mView::updateRecentItem)
                 .subscribe());
     }
 
-    @Override
-    public void stopObserveUiEvents() {
-        Timber.d("stopObserveUiEvents: ");
-        if (!mDisposable.isDisposed()) {
-            mDisposable.dispose();
-        }
+    private void addOptionsMenuObservable() {
+        Timber.v("addOptionsMenuObservable: ");
+        mDisposable.add(mView.optionsMenuObservable()
+                .switchMap(this::handleOptionsMenuClick)
+                .subscribe());
     }
 
     private Observable<TranslationModel> loadRecent() {

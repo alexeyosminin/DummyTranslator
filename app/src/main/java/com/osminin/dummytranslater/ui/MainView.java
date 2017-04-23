@@ -39,6 +39,8 @@ public interface MainView extends BaseView {
 
     <T> Observable<T> showFavoritesView(T item);
 
+    <T> Observable<T> requestInputFocus(T item);
+
     Observable<Boolean> setFavorite(Boolean isFavorite);
 
     Observable<TranslationModel> showTranslationView(TranslationModel model);
@@ -48,6 +50,8 @@ public interface MainView extends BaseView {
     Observable<TranslationModel> setTranslation(TranslationModel model);
 
     Observable<TranslationModel> addRecentItem(TranslationModel model);
+
+    Observable<TranslationModel> updateRecentItem(TranslationModel item);
 
     Observable<TranslationModel> setDefaultTranslationDirection(TranslationModel model);
 }

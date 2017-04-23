@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:transitionName="@string/main_translate_transition"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     card_view:cardCornerRadius="@dimen/cards_corner_radius"
@@ -17,71 +17,97 @@
         <TextView
             android:id="@+id/input_edit_text"
             style="@android:style/Widget.Material.EditText"
-            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:hint="@string/main_tap_to_enter"
-            card_view:layout_constraintBottom_toBottomOf="parent" card_view:layout_constraintLeft_toLeftOf="parent"
-            card_view:layout_constraintRight_toRightOf="parent" card_view:layout_constraintTop_toTopOf="parent"
-            android:layout_marginEnd="8dp"/>
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintLeft_toLeftOf="parent"
+            card_view:layout_constraintRight_toRightOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent" />
+
         <Spinner
             android:id="@+id/input_from_spinner"
-            android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp" android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            card_view:layout_constraintBottom_toTopOf="@+id/input_edit_text" card_view:layout_constraintLeft_toLeftOf="parent"
-            card_view:layout_constraintTop_toTopOf="parent"/>
-        <Spinner
-            android:id="@+id/input_to_spinner"
-            android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp" card_view:layout_constraintBottom_toTopOf="@+id/input_edit_text"
-            card_view:layout_constraintRight_toRightOf="parent"
-            card_view:layout_constraintTop_toTopOf="parent" android:layout_marginEnd="8dp"/>
-        <ImageButton
-            android:id="@+id/imageButton"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            card_view:layout_constraintBottom_toTopOf="@+id/input_edit_text"
+            card_view:layout_constraintLeft_toLeftOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent" />
+
+        <Spinner
+            android:id="@+id/input_to_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp" android:background="@android:color/transparent"
+            android:layout_marginTop="8dp"
+            card_view:layout_constraintBottom_toTopOf="@+id/input_edit_text"
+            card_view:layout_constraintRight_toRightOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/transparent"
             card_view:layout_constraintBottom_toBottomOf="parent"
-            card_view:layout_constraintLeft_toLeftOf="parent" card_view:layout_constraintRight_toRightOf="parent"
-            card_view:layout_constraintTop_toBottomOf="@+id/input_edit_text" card_view:srcCompat="@drawable/ic_mic_black_24dp"
-            android:layout_marginStart="8dp" android:layout_marginEnd="8dp"/>
+            card_view:layout_constraintLeft_toLeftOf="parent"
+            card_view:layout_constraintRight_toRightOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/input_edit_text"
+            card_view:srcCompat="@drawable/ic_mic_black_24dp" />
+
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            card_view:srcCompat="@drawable/ic_volume_up_black_24dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginLeft="8dp"
-            card_view:layout_constraintLeft_toLeftOf="parent" android:layout_marginTop="8dp"
-            card_view:layout_constraintTop_toBottomOf="@+id/input_edit_text"
+            android:layout_marginTop="8dp"
             card_view:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="8dp"/>
+            card_view:layout_constraintLeft_toLeftOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/input_edit_text"
+            card_view:srcCompat="@drawable/ic_volume_up_black_24dp" />
+
         <ImageView
             android:id="@+id/input_clear_btn"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:padding="8dp"
             card_view:layout_constraintBottom_toBottomOf="parent"
-            card_view:layout_constraintRight_toRightOf="parent" card_view:layout_constraintTop_toBottomOf="@+id/input_edit_text"
-            card_view:srcCompat="@drawable/ic_close_black_24dp"/>
+            card_view:layout_constraintRight_toRightOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/input_edit_text"
+            card_view:srcCompat="@drawable/ic_close_black_24dp" />
+
         <ImageView
             android:id="@+id/input_reverse_direction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            card_view:srcCompat="@drawable/ic_compare_arrows_black_24dp"
-            card_view:layout_constraintTop_toTopOf="parent" android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
             android:padding="8dp"
             card_view:layout_constraintBottom_toTopOf="@+id/input_edit_text"
-            android:layout_marginLeft="8dp" card_view:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginRight="8dp" card_view:layout_constraintRight_toRightOf="parent"/>
+            card_view:layout_constraintLeft_toLeftOf="parent"
+            card_view:layout_constraintRight_toRightOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent"
+            card_view:srcCompat="@drawable/ic_compare_arrows_black_24dp" />
     </android.support.constraint.ConstraintLayout>
 
 </android.support.v7.widget.CardView>

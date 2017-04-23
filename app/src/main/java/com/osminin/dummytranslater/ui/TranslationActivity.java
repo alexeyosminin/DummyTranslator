@@ -1,10 +1,12 @@
 package com.osminin.dummytranslater.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -19,7 +21,6 @@ import com.osminin.dummytranslater.ui.base.BaseActivity;
 
 import javax.inject.Inject;
 
-import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
@@ -27,7 +28,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subjects.PublishSubject;
 import timber.log.Timber;
 
-import static com.osminin.dummytranslater.ui.MainActivity.TRANSLATION_MODEL_KEY;
+import static com.osminin.dummytranslater.Config.TRANSLATION_MODEL_KEY;
 
 /**
  * TODO: Add a class header comment!
@@ -38,7 +39,7 @@ public final class TranslationActivity extends BaseActivity implements Translati
     @Inject
     TranslationPresenter mPresenter;
 
-    @BindView(R.id.translate_edit_text)
+    @BindView(R.id.translate_text_view)
     EditText mTranslationInput;
     @BindView(R.id.translate_result)
     TextView mTranslationResult;
@@ -134,8 +135,7 @@ public final class TranslationActivity extends BaseActivity implements Translati
         Timber.d("onTextTranslated: ");
         return Observable.just(model)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(this::setTranslatedText)
-                .doOnNext(this::hideProgress);
+                .doOnNext(this::setTranslatedText);
     }
 
     @Override
@@ -186,10 +186,25 @@ public final class TranslationActivity extends BaseActivity implements Translati
         showCrossBtn(item);
     }
 
-    private <T> void hideProgress(T item) {
+    public <T> Observable<T> hideProgress(T item) {
         Timber.d("hideProgress: ");
-        mProgress.setVisibility(View.GONE);
-        showCrossBtn(item);
+        return Observable.just(item)
+                .doOnNext(t -> {
+                    mProgress.setVisibility(View.GONE);
+                });
+
+    }
+
+    @Override
+    public <T> Observable<T> hideKeyboard(T item) {
+        return Observable.just(item)
+                .doOnNext(t -> {
+                    View view = this.getCurrentFocus();
+                    if (view != null) {
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
+                });
     }
 
     private <T> void clearInputOutput(T item) {
