@@ -98,14 +98,11 @@ public final class TranslationPresenterImpl extends BasePresenterImpl<Translatio
 
     private void startObserveKeypad() {
         mDisposable.add(mView.softEnterKeyEvents()
-                .filter(e -> e.getKeyCode() == KeyEvent.KEYCODE_ENTER)
+                .filter(e -> e.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                        && e.getAction() == KeyEvent.ACTION_UP)
                 .map(e -> mModel)
                 .filter(m -> m.getTranslations() != null
                         && !m.getTranslations().isEmpty())
-                .observeOn(Schedulers.single())
-                .switchMap(mDataStore::open)
-                .switchMap(mDataStore::add)
-                .switchMap(mDataStore::close)
                 .switchMap(mView::onTextInputStop)
                 .subscribe(model -> Timber.d("startObserveKeypad: %s", model),
                         this::handleError));

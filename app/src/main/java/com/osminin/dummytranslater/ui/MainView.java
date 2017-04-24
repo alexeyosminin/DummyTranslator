@@ -1,5 +1,7 @@
 package com.osminin.dummytranslater.ui;
 
+import android.view.View;
+
 import com.osminin.dummytranslater.models.Languages;
 import com.osminin.dummytranslater.models.TranslationModel;
 import com.osminin.dummytranslater.ui.base.BaseView;
@@ -29,7 +31,7 @@ public interface MainView extends BaseView {
 
     Observable<Object> favoriteStarObservable();
 
-    Observable<Integer> optionsMenuObservable();
+    Observable<View> optionsMenuObservable();
 
     <T> Observable<T> changeTransDirection(T item);
 
@@ -37,7 +39,7 @@ public interface MainView extends BaseView {
 
     <T> Observable<T> clearInputCard(T item);
 
-    <T> Observable<T> showFavoritesView(T item);
+    Observable<View> showFavoritesView(View item);
 
     <T> Observable<T> requestInputFocus(T item);
 

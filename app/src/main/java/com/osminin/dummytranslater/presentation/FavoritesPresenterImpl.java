@@ -8,6 +8,7 @@ import com.osminin.dummytranslater.ui.FavoritesView;
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -31,8 +32,12 @@ public final class FavoritesPresenterImpl extends BasePresenterImpl<FavoritesVie
         prepareDisposable();
         mDisposable.add(mDataStore.open(mDataStore)
                 .switchMap(dataStore -> dataStore.queryFavorites())
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(mView::addItem)
-                .doOnComplete(() -> mDisposable.add(mDataStore.close(mDataStore).subscribe()))
+                .doOnComplete(() -> mDisposable.add(mDataStore.close(mDataStore)
+                        .subscribeOn(Schedulers.single())
+                        .subscribe()))
+                .subscribeOn(Schedulers.single())
                 .subscribe());
         mDisposable.add(mView.itemClickObservable()
                 .subscribe(mView::finishView));

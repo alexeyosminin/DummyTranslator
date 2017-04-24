@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Transition;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.view.RxView;
@@ -48,6 +50,7 @@ public final class FavoritesActivity extends BaseActivity implements FavoritesVi
     protected void onCreate(Bundle savedInstanceState) {
         Timber.d("onCreate: ");
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(R.layout.activity_favorites);
         ButterKnife.bind(this);
         App.getAppComponent().inject(this);
@@ -62,13 +65,39 @@ public final class FavoritesActivity extends BaseActivity implements FavoritesVi
     protected void onStart() {
         Timber.d("onStart: ");
         super.onStart();
-        mPresenter.startObserveUiEvents();
+        getWindow().getSharedElementEnterTransition().addListener(new Transition.TransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                mPresenter.startObserveUiEvents();
+            }
+
+            @Override
+            public void onTransitionCancel(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionPause(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionResume(Transition transition) {
+
+            }
+        });
     }
 
     @Override
     protected void onStop() {
         Timber.d("onStop: ");
         super.onStop();
+        getWindow().getSharedElementEnterTransition().addListener(null);
         mPresenter.stopObserveUiEvents();
     }
 

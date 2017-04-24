@@ -50,8 +50,10 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
 
     @Override
     public Observable<TranslationModel> update(TranslationModel item) {
-        //TODO: rework (it replaces existing entries with loss of data)
-        return add(item);
+        return Observable.just(item)
+                .switchMap(this::getItem)
+                .doOnNext(i -> i.mergeWith(item))
+                .switchMap(this::add);
     }
 
     @Override
@@ -83,6 +85,15 @@ public final class RealmTranslationDataStore implements TranslationDataStore {
         RealmRecentModel model = RealmRecentModel.toDbModel(item);
         mRealm.copyToRealmOrUpdate(model);
         mRealm.commitTransaction();
+    }
+
+    private Observable<TranslationModel> getItem(TranslationModel item) {
+        return Observable.fromIterable(mRealm
+                .where(RealmRecentModel.class)
+                .equalTo(RealmRecentModel.getPrimaryKey(), item.getPrimaryText())
+                .findAll())
+                .take(1)
+                .map(m -> m.fromDbModel());
     }
 
     private <T> void trim(T item) {

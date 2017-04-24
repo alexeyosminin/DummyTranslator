@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -32,6 +33,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 import oxim.digital.rx2anim.RxAnimations;
 import timber.log.Timber;
 
@@ -65,14 +67,15 @@ public class MainActivity extends BaseActivity implements MainView {
     private View mClearInputBtn;
     private ImageView mFavoriteStar;
 
-    private PublishSubject<TranslationModel> mActivityResultSubject;
-    private PublishSubject<Integer> mOptionsSubject;
+    private Subject<TranslationModel> mActivityResultSubject;
+    private Subject<View> mOptionsSubject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         Timber.d("onCreate: ");
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         App.getAppComponent().inject(this);
@@ -115,7 +118,7 @@ public class MainActivity extends BaseActivity implements MainView {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Timber.d("onOptionsItemSelected: ");
-        mOptionsSubject.onNext(item.getItemId());
+        mOptionsSubject.onNext(findViewById(item.getItemId()));
         return true;
     }
 
@@ -163,7 +166,7 @@ public class MainActivity extends BaseActivity implements MainView {
     @Override
     public Observable<TranslationModel> activityResultObservable() {
         Timber.d("activityResultObservable: ");
-        return mActivityResultSubject;
+        return mActivityResultSubject.cast(TranslationModel.class);
     }
 
     @Override
@@ -181,8 +184,8 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
-    public Observable<Integer> optionsMenuObservable() {
-        return mOptionsSubject;
+    public Observable<View> optionsMenuObservable() {
+        return mOptionsSubject.cast(View.class);
     }
 
     @Override
@@ -217,9 +220,9 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
-    public <T> Observable<T> showFavoritesView(T item) {
+    public Observable<View> showFavoritesView(View view) {
         Timber.d("showFavoritesView: ");
-        return Observable.just(item)
+        return Observable.just(view)
                 .doOnNext(this::launchFavoritesView);
     }
 
@@ -257,7 +260,6 @@ public class MainActivity extends BaseActivity implements MainView {
     public Observable<TranslationModel> setTranslation(TranslationModel model) {
         Timber.d("setTranslation: %s", model);
         return Observable.just(model)
-                //.filter(model1 -> !model.getTranslations().isEmpty())
                 .doOnNext(this::addTranslationCard)
                 .doOnNext(m -> mTranslationField.setText(m.getTranslations().get(0)))
                 .doOnNext(m -> mFavoriteStar.setImageResource(
@@ -289,11 +291,12 @@ public class MainActivity extends BaseActivity implements MainView {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Timber.d("onActivityResult: ");
+        Timber.d("onActivityResult: requestCode = %s, resultCode = %s", requestCode, resultCode);
         if ((requestCode == REQUEST_TRANSLATION_ACTIVITY
-                    || requestCode == REQUEST_FAVORITES_ACTIVITY)
+                || requestCode == REQUEST_FAVORITES_ACTIVITY)
                 && resultCode == RESULT_OK) {
             TranslationModel model = data.getParcelableExtra(TRANSLATION_MODEL_KEY);
+            Timber.d("onActivityResult: mode = %s", model);
             mActivityResultSubject.onNext(model);
         }
     }
@@ -307,10 +310,12 @@ public class MainActivity extends BaseActivity implements MainView {
         startActivityForResult(intent, REQUEST_TRANSLATION_ACTIVITY, options.toBundle());
     }
 
-    private <T> void launchFavoritesView(T item) {
+    private void launchFavoritesView(View item) {
         Timber.d("launchFavoritesView: ");
         Intent intent = new Intent(this, FavoritesActivity.class);
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeBasic();
+        item.setTransitionName("translation_favorite");
+        ActivityOptionsCompat options = ActivityOptionsCompat.
+                makeSceneTransitionAnimation(this, item, item.getTransitionName());
         startActivityForResult(intent, REQUEST_FAVORITES_ACTIVITY, options.toBundle());
     }
 

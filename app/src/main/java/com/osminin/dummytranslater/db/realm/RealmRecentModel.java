@@ -117,6 +117,10 @@ public class RealmRecentModel implements RealmModel {
         return "isFavorite";
     }
 
+    public static String getPrimaryKey() {
+        return "mPrimaryText";
+    }
+
     public TranslationModel fromDbModel() {
         return new TranslationModel(getPrimaryText(),
                 getSecondaryText(),

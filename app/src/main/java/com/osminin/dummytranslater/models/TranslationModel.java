@@ -214,4 +214,9 @@ public class TranslationModel implements Parcelable, Cloneable, Comparable<Trans
     public int compareTo(@NonNull TranslationModel o) {
         return Long.compare(o.getTimestamp(), mTimestamp);
     }
+
+    public void mergeWith(TranslationModel other) {
+        this.mTimestamp = other.mTimestamp;
+        this.mTranslationDirection = other.mTranslationDirection;
+    }
 }

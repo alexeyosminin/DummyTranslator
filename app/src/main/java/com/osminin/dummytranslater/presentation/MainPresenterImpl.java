@@ -1,5 +1,7 @@
 package com.osminin.dummytranslater.presentation;
 
+import android.view.View;
+
 import com.osminin.dummytranslater.R;
 import com.osminin.dummytranslater.application.App;
 import com.osminin.dummytranslater.db.TranslationDataStore;
@@ -106,9 +108,15 @@ public final class MainPresenterImpl extends BasePresenterImpl<MainView> impleme
                 .filter(m -> m.getTranslations() != null
                         && !m.getTranslations().isEmpty())
                 .doOnNext(model -> mTranslationModel = model.clone())
+                .observeOn(Schedulers.single())
+                .switchMap(mDataStore::open)
+                .switchMap(mDataStore::add)
+                .switchMap(mDataStore::close)
+                .observeOn(AndroidSchedulers.mainThread())
+                .switchMap(mView::clearRecentList)
                 .switchMap(mView::setPrimaryText)
                 .switchMap(mView::setTranslation)
-                .subscribe());
+                .subscribe(model -> reloadRecents()));
     }
 
     private void addClearInputObservable() {
@@ -186,11 +194,11 @@ public final class MainPresenterImpl extends BasePresenterImpl<MainView> impleme
                 .subscribe());
     }
 
-    private Observable<Integer> handleOptionsMenuClick(Integer item) {
+    private Observable<View> handleOptionsMenuClick(View view) {
         Timber.d("handleOptionsMenuClick: ");
-        switch (item) {
+        switch (view.getId()) {
             case R.id.favorites:
-                return mView.showFavoritesView(item);
+                return mView.showFavoritesView(view);
         }
         return Observable.empty();
     }

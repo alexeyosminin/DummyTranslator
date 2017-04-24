@@ -123,10 +123,13 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     //add a header to the adapter
     public void addInputCard(View header) {
         Timber.d("addInputCard: ");
-        if (!mInput.contains(header)) {
+        if (mInput.isEmpty()) {
             mInput.add(header);
             //animate
             notifyItemInserted(mInput.size() - 1);
+        } else {
+            mInput.set(mInput.size() - 1, header);
+            notifyItemChanged(mInput.size() - 1);
         }
     }
 
@@ -188,6 +191,10 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void updateRecentItem(TranslationModel item) {
         Timber.d("updateRecentItem: %s", item);
         int pos = Collections.binarySearch(mRecents, item);
+        if (pos < 0) {
+            Timber.wtf("updateRecentItem: ");
+            return;
+        }
         mRecents.set(pos, item);
         notifyItemChanged(pos + mInput.size() + mTranslation.size());
     }
